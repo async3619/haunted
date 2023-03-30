@@ -1,9 +1,5 @@
-async function clearConsole() {
-    process.stdout.write("\x1Bc");
-}
+import Server from "@root/server";
 
-async function main() {
-    console.log(":D");
-}
+Server.getInstance().start(3000);
 
-clearConsole().then(main).then();
+console.log("Server started on port 3000");

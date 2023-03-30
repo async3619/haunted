@@ -4,11 +4,12 @@
     "main": "index.js",
     "license": "MIT",
     "scripts": {
-        "dev": "cross-env TS_NODE_COMPILER=ttypescript node -r ts-node/register ./src/index.ts",
-        "watch": "cross-env TS_NODE_COMPILER=ttypescript node -r ts-node/register --watch ./src/index.ts"
+        "dev": "cross-env TS_NODE_COMPILER=ttypescript node -r ts-node/register -r tsconfig-paths/register ./src/index.ts",
+        "watch": "cross-env TS_NODE_COMPILER=ttypescript node -r ts-node/register -r tsconfig-paths/register --watch ./src/index.ts"
     },
     "devDependencies": {
         "@types/node": "^18.6.4",
+        "@types/spotify-web-api-node": "^5.0.7",
         "@typescript-eslint/eslint-plugin": "^5.32.0",
         "@typescript-eslint/parser": "^5.32.0",
         "cross-env": "^7.0.3",
@@ -18,10 +19,14 @@
         "prettier": "^2.7.1",
         "swc-node": "^1.0.0",
         "ts-node": "^10.9.1",
+        "tsconfig-paths": "^4.2.0",
         "ttypescript": "^1.5.15",
         "typescript": "^4.7.4"
     },
     "dependencies": {
+        "@trpc/server": "^10.18.0",
+        "dayjs": "^1.11.7",
+        "spotify-web-api-node": "^5.0.2",
         "typia": "^3.4.20"
     }
 }

@@ -13,6 +13,9 @@
     <a href="https://github.com/async3619/haunted/blob/main/LICENSE">
         <img src="https://img.shields.io/github/license/async3619/haunted.svg?style=flat-square" alt="MIT License" />
     </a>
+    <a href="https://codecov.io/gh/async3619/haunted">
+        <img alt="Codecov" src="https://img.shields.io/codecov/c/github/async3619/haunted?style=flat-square&token=DF3uhBCl9j">
+    </a>
     <br />
     <sup>Music metadata retrieving server for <a href="https://github.com/async3619/cruise">Cruise</a></sup>
     <br />

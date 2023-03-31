@@ -10,7 +10,7 @@
         "target": "es2017",
         "sourceMap": true,
         "outDir": "./dist",
-        "baseUrl": "./",
+        "baseUrl": "./src",
         "incremental": true,
         "skipLibCheck": true,
         "strictNullChecks": true,
@@ -19,6 +19,7 @@
         "forceConsistentCasingInFileNames": false,
         "noFallthroughCasesInSwitch": false,
         "esModuleInterop": true,
+        "resolveJsonModule": true,
         "plugins": [
             {
                 "transform": "typia/lib/transform"
@@ -27,10 +28,11 @@
             }
         ],
         "paths": {
-            "@root/*": ["./src/*"],
-            "@utils/*": ["./src/utils/*"],
-            "@resolver": ["./src/resolver/index.ts"],
-            "@resolver/*": ["./src/resolver/*"]
+            "@root/*": ["./*"],
+            "@utils/*": ["./utils/*"],
+            "@resolver": ["./resolver/index.ts"],
+            "@resolver/*": ["./resolver/*"]
         }
-    }
+    },
+    "include": ["tools", "package.json", "src"],
 }

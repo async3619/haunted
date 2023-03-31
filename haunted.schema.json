@@ -1,0 +1,40 @@
+{
+    "type": "object",
+    "properties": {
+        "resolvers": {
+            "x-typia-required": true,
+            "type": "object",
+            "properties": {
+                "spotify": {
+                    "x-typia-required": false,
+                    "type": "object",
+                    "properties": {
+                        "clientId": {
+                            "type": "string",
+                            "nullable": false,
+                            "x-typia-required": true
+                        },
+                        "clientSecret": {
+                            "type": "string",
+                            "nullable": false,
+                            "x-typia-required": true
+                        }
+                    },
+                    "nullable": false,
+                    "required": [
+                        "clientId",
+                        "clientSecret"
+                    ],
+                    "x-typia_jsDocTags": []
+                }
+            },
+            "nullable": false,
+            "x-typia_jsDocTags": []
+        }
+    },
+    "nullable": false,
+    "required": [
+        "resolvers"
+    ],
+    "x-typia_jsDocTags": []
+}

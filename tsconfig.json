@@ -28,6 +28,8 @@
         ],
         "paths": {
             "@root/*": ["./src/*"],
+            "@utils/*": ["./src/utils/*"],
+            "@resolver": ["./src/resolver/index.ts"],
             "@resolver/*": ["./src/resolver/*"]
         }
     }

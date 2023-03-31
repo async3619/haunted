@@ -1,5 +1,8 @@
-import Server from "@root/server";
+import App from "@root/app";
 
-Server.getInstance().start(3000);
-
-console.log("Server started on port 3000");
+(async () => {
+    try {
+        const app = await App.initialize();
+        await app.start();
+    } catch (e) {}
+})();

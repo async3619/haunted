@@ -11,15 +11,6 @@ interface SearchInput {
 }
 
 export default class Server {
-    private static readonly instance = new Server();
-
-    public static getInstance() {
-        return this.instance;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    private constructor() {}
-
     private readonly rootRouter = t.router({
         query: {
             search: t.procedure.input(createAssert<SearchInput>()).query(({ input }) => {

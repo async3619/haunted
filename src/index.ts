@@ -6,3 +6,5 @@ import App from "@root/app";
         await app.start();
     } catch (e) {}
 })();
+
+export { ServerRouter } from "@root/server";

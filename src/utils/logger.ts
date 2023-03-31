@@ -186,7 +186,12 @@ export default class Logger implements Record<LogLevel, LoggerFn> {
             process.stdout.write(`failed. ${time}\n`);
             Logger.setLock(false);
             if (printError) {
-                this[failedLevel](`${measuredData.exception.message}`);
+                const message =
+                    typeof measuredData.exception.message === "string"
+                        ? measuredData.exception.message
+                        : JSON.stringify(measuredData.exception.message);
+
+                this[failedLevel](message);
             }
 
             throw measuredData.exception;

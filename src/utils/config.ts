@@ -10,7 +10,7 @@ import { createResolver, ResolverMap, ResolverOptionsMap, ResolverPair, Resolver
 
 import Logger from "@utils/logger";
 
-const DEFAULT_CONFIG: ConfigData = {
+export const DEFAULT_CONFIG: ConfigData = {
     resolvers: {},
 };
 

@@ -29,6 +29,7 @@ describe("App", () => {
 
         mockedFs.existsSync.mockReturnValue(true);
         mockedFs.readJSON.mockResolvedValue({
+            port: 3000,
             resolvers: {
                 spotify: {
                     clientId: process.env.SPOTIFY_CLIENT_ID,

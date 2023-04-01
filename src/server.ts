@@ -3,30 +3,38 @@ import { createAssert } from "typia";
 import { initTRPC } from "@trpc/server";
 import { createHTTPServer } from "@trpc/server/adapters/standalone";
 
-export const t = initTRPC.create();
+import { ResolverPair } from "@resolver";
 
-interface SearchInput {
-    query: string;
-    limit?: number;
-}
+import { SearchInput, SearchOutput } from "@utils/types";
 
 export default class Server {
-    private readonly rootRouter = t.router({
-        query: {
-            search: t.procedure.input(createAssert<SearchInput>()).query(({ input }) => {
-                console.log(input);
+    private readonly resolvers: ResolverPair[];
 
-                return {
-                    musics: [],
-                };
-            }),
-        },
+    protected readonly t = initTRPC.create();
+    protected readonly rootRouter = this.t.router({
+        search: this.t.procedure.input(createAssert<SearchInput>()).query(({ input }) => this.search(input)),
     });
+
+    public constructor(resolvers: ResolverPair[]) {
+        this.resolvers = resolvers;
+    }
 
     public start(port: number) {
         createHTTPServer({
             router: this.rootRouter,
         }).listen(port);
+    }
+
+    private async search(input: SearchInput): Promise<SearchOutput> {
+        const results: SearchOutput[] = [];
+        for (const resolver of this.resolvers) {
+            const result = await resolver[1].search(input.query, input.limit);
+            results.push(result);
+        }
+
+        return {
+            musics: results.flatMap(result => result.musics),
+        };
     }
 }
 

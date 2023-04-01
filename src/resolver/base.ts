@@ -2,7 +2,7 @@ import _ from "lodash";
 import { ReadonlyDeep } from "type-fest";
 
 import { Loggable } from "@utils/loggable";
-import { SearchResult } from "@utils/types";
+import { SearchOutput } from "@utils/types";
 
 export default abstract class BaseResolver<
     TType extends string,
@@ -21,5 +21,5 @@ export default abstract class BaseResolver<
     }
 
     public abstract initialize(): Promise<void>;
-    public abstract search(query: string, limit?: number): Promise<SearchResult>;
+    public abstract search(query: string, limit?: number): Promise<SearchOutput>;
 }

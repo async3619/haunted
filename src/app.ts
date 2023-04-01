@@ -7,7 +7,7 @@ import Logger from "@utils/logger";
 
 export default class App {
     public static readonly logger = new Logger(App.name);
-    private readonly server = new Server();
+    private readonly server: Server;
     private readonly config: Config;
 
     public static async initialize() {
@@ -22,11 +22,12 @@ export default class App {
             });
         }
 
-        return new App(config);
+        return new App(config, new Server(config.resolvers));
     }
 
-    private constructor(config: Config) {
+    private constructor(config: Config, server: Server) {
         this.config = config;
+        this.server = server;
     }
 
     public async start(port = 3000) {

@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 
 import BaseResolver from "@resolver/base";
 
-import { SearchResult } from "@utils/types";
+import { SearchOutput } from "@utils/types";
 
 export interface SpotifyResolverOptions {
     clientId: string;
@@ -30,7 +30,7 @@ export default class SpotifyResolver extends BaseResolver<"Spotify", SpotifyReso
         this.client.setAccessToken(access_token);
     }
 
-    public async search(query: string, limit = 50): Promise<SearchResult> {
+    public async search(query: string, limit = 50): Promise<SearchOutput> {
         const { body } = await this.client.search(query, ["artist", "album", "track"], {
             limit,
         });

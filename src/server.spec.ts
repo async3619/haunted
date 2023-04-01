@@ -4,7 +4,7 @@ describe("Server", () => {
     let target: Server;
 
     beforeEach(() => {
-        target = new Server();
+        target = new Server([]);
     });
 
     it("should be able to be instantiated", () => {

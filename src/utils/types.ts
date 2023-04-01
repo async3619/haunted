@@ -9,7 +9,12 @@ export interface Music {
     year: number;
 }
 
-export interface SearchResult {
+export interface SearchInput {
+    query: string;
+    limit?: number;
+}
+
+export interface SearchOutput {
     musics: Music[];
 }
 

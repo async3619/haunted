@@ -1,10 +1,10 @@
-import Server from "@root/server";
+import TRPCServer from "@server/trpc";
 
-describe("Server", () => {
-    let target: Server;
+describe("TRPC Server", () => {
+    let target: TRPCServer;
 
     beforeEach(() => {
-        target = new Server([]);
+        target = new TRPCServer([]);
     });
 
     it("should be able to be instantiated", () => {

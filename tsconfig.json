@@ -25,7 +25,9 @@
             "@root/*": ["./*"],
             "@utils/*": ["./utils/*"],
             "@resolver": ["./resolver/index.ts"],
-            "@resolver/*": ["./resolver/*"]
+            "@resolver/*": ["./resolver/*"],
+            "@server": ["./server/index.ts"],
+            "@server/*": ["./server/*"]
         }
     },
     "include": ["tools", "package.json", "src", "jest.config.ts", "**/*.spec.ts"]

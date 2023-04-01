@@ -4,10 +4,11 @@ import { initTRPC } from "@trpc/server";
 import { createHTTPServer } from "@trpc/server/adapters/standalone";
 
 import { ResolverPair } from "@resolver";
+import BaseServer from "@server/base";
 
 import { SearchAlbumsOutput, SearchOutput, SearchArtistsOutput, SearchInput, SearchMusicsOutput } from "@utils/types";
 
-export default class Server {
+export default class TRPCServer extends BaseServer {
     private readonly resolvers: ResolverPair[];
 
     protected readonly t = initTRPC.create();
@@ -28,10 +29,12 @@ export default class Server {
     });
 
     public constructor(resolvers: ResolverPair[]) {
+        super();
+
         this.resolvers = resolvers;
     }
 
-    public start(port: number) {
+    public async start(port: number) {
         createHTTPServer({
             router: this.rootRouter,
         }).listen(port);
@@ -79,4 +82,4 @@ export default class Server {
     }
 }
 
-export type ServerRouter = Server["rootRouter"];
+export type TRPCServerRouter = TRPCServer["rootRouter"];

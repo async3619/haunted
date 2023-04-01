@@ -7,4 +7,4 @@ import App from "@root/app";
     } catch (e) {}
 })();
 
-export { ServerRouter } from "@root/server";
+export { TRPCServerRouter } from "@server/trpc";

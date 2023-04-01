@@ -1,6 +1,6 @@
 import chalk from "chalk";
 
-import Server from "@root/server";
+import Trpc from "@server/trpc";
 
 import Config from "@utils/config";
 import Logger from "@utils/logger";
@@ -20,10 +20,10 @@ export default class App {
             });
         }
 
-        return new App(config, new Server(config.resolvers));
+        return new App(config, new Trpc(config.resolvers));
     }
 
-    private constructor(private readonly config: Config, private readonly server: Server) {}
+    private constructor(private readonly config: Config, private readonly server: Trpc) {}
 
     public async start() {
         await this.server.start(this.config.port);

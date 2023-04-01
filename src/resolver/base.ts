@@ -2,7 +2,7 @@ import _ from "lodash";
 import { ReadonlyDeep } from "type-fest";
 
 import { Loggable } from "@utils/loggable";
-import { SearchOutput } from "@utils/types";
+import { SearchAlbumsOutput, SearchOutput, SearchArtistsOutput, SearchMusicsOutput } from "@utils/types";
 
 export default abstract class BaseResolver<
     TType extends string,
@@ -21,5 +21,9 @@ export default abstract class BaseResolver<
     }
 
     public abstract initialize(): Promise<void>;
+
     public abstract search(query: string, limit?: number): Promise<SearchOutput>;
+    public abstract searchMusics(query: string, limit?: number): Promise<SearchMusicsOutput>;
+    public abstract searchAlbums(query: string, limit?: number): Promise<SearchAlbumsOutput>;
+    public abstract searchArtists(query: string, limit?: number): Promise<SearchArtistsOutput>;
 }

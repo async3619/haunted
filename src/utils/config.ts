@@ -11,10 +11,12 @@ import { createResolver, ResolverMap, ResolverOptionsMap, ResolverPair, Resolver
 import Logger from "@utils/logger";
 
 export const DEFAULT_CONFIG: ConfigData = {
+    port: 3000,
     resolvers: {},
 };
 
 export interface ConfigData {
+    port: number;
     resolvers: Partial<ResolverOptionsMap>;
 }
 
@@ -86,12 +88,13 @@ export default class Config {
             await Config.dumpConfigSchema("./haunted.schema.json");
         }
 
-        return new Config(Object.fromEntries(resolvers), resolvers);
+        return new Config(Object.fromEntries(resolvers), resolvers, config);
     }
 
     private constructor(
         private readonly allResolverMap: Partial<ResolverMap>,
         private readonly allResolvers: ResolverPair[],
+        private readonly rawConfig: ConfigData,
     ) {}
 
     public get resolverMap() {
@@ -101,5 +104,9 @@ export default class Config {
     }
     public get resolvers() {
         return [...this.allResolvers];
+    }
+
+    public get port() {
+        return this.rawConfig.port;
     }
 }

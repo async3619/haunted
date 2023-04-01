@@ -1,6 +1,11 @@
 {
     "type": "object",
     "properties": {
+        "port": {
+            "type": "number",
+            "nullable": false,
+            "x-typia-required": true
+        },
         "resolvers": {
             "x-typia-required": true,
             "type": "object",
@@ -34,6 +39,7 @@
     },
     "nullable": false,
     "required": [
+        "port",
         "resolvers"
     ],
     "x-typia_jsDocTags": []

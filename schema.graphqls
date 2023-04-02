@@ -1,0 +1,47 @@
+type Query {
+  searchMusics(input: SearchInput!): [Music!]!
+  searchAlbums(input: SearchInput!): [Album!]!
+  searchArtists(input: SearchInput!): [Artist!]!
+  search(input: SearchInput!): SearchOutput!
+}
+
+type Music {
+  title: String!
+  artists: [String!]!
+  album: String!
+  albumArtists: String!
+  duration: Int!
+  track: Int!
+  disc: Int!
+  year: Int!
+}
+
+input SearchInput {
+  query: String!
+  limit: Int
+}
+
+type Album {
+  title: String!
+  artists: [String!]!
+  releaseDate: String!
+  trackCount: Int!
+  albumArts: [Image!]!
+}
+
+type Image {
+  url: String!
+  width: Int
+  height: Int
+}
+
+type Artist {
+  name: String!
+  artistImages: [Image!]!
+}
+
+type SearchOutput {
+  musics: [Music!]!
+  albums: [Album!]!
+  artists: [Artist!]!
+}

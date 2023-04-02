@@ -35,6 +35,22 @@
             "x-typia-required": true,
             "type": "object",
             "properties": {
+                "trpc": {
+                    "x-typia-required": false,
+                    "type": "object",
+                    "properties": {
+                        "port": {
+                            "type": "number",
+                            "nullable": false,
+                            "x-typia-required": true
+                        }
+                    },
+                    "nullable": false,
+                    "required": [
+                        "port"
+                    ],
+                    "x-typia_jsDocTags": []
+                },
                 "graphql": {
                     "x-typia-required": false,
                     "type": "object",
@@ -48,22 +64,6 @@
                             "type": "boolean",
                             "nullable": false,
                             "x-typia-required": false
-                        }
-                    },
-                    "nullable": false,
-                    "required": [
-                        "port"
-                    ],
-                    "x-typia_jsDocTags": []
-                },
-                "trpc": {
-                    "x-typia-required": false,
-                    "type": "object",
-                    "properties": {
-                        "port": {
-                            "type": "number",
-                            "nullable": false,
-                            "x-typia-required": true
                         }
                     },
                     "nullable": false,

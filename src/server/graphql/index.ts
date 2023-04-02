@@ -2,6 +2,8 @@ import { buildSchema } from "type-graphql";
 import type { GraphQLSchema } from "graphql/type";
 import http from "http";
 import express from "express";
+import * as fs from "fs-extra";
+import { printSchema } from "graphql";
 
 import { ApolloServer } from "apollo-server-express";
 import { ApolloServerPluginDrainHttpServer } from "apollo-server-core";
@@ -50,6 +52,19 @@ export default class GraphQLServer extends BaseServer<"GraphQL", GraphQLServerOp
             context: () => ({ resolvers: this.resolvers }),
             plugins: [ApolloServerPluginDrainHttpServer({ httpServer: this.server })],
         });
+
+        if (process.env.NODE_ENV === "development") {
+            const schema = this.schema;
+
+            await this.logger.task({
+                message: "Writing GraphQL schema to file",
+                level: "debug",
+                task: async () => {
+                    const rawSchema = printSchema(schema);
+                    await fs.writeFile("schema.graphqls", rawSchema);
+                },
+            });
+        }
 
         await this.apolloServer.start();
         this.apolloServer.applyMiddleware({ app: this.express, path: "/" });

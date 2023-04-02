@@ -177,28 +177,41 @@ export default class Logger implements Record<LogLevel, LoggerFn> {
         done = "done.",
     }: TaskOption<T>): Promise<T> => {
         this[level](`${message} ... `, [], false);
+        const isLocked = Logger.isLocked;
 
-        Logger.setLock(true);
+        if (!isLocked) {
+            Logger.setLock(true);
+        }
+
         const measuredData = await measureTime(task);
         const time = chalk.gray(`(${measuredData.elapsedTime}ms)`);
 
-        if ("exception" in measuredData) {
-            process.stdout.write(`failed. ${time}\n`);
-            Logger.setLock(false);
-            if (printError) {
-                const message =
-                    typeof measuredData.exception.message === "string"
-                        ? measuredData.exception.message
-                        : JSON.stringify(measuredData.exception.message);
+        if (!isLocked) {
+            if ("exception" in measuredData) {
+                process.stdout.write(`failed. ${time}\n`);
+                Logger.setLock(false);
+                if (printError) {
+                    const message =
+                        typeof measuredData.exception.message === "string"
+                            ? measuredData.exception.message
+                            : JSON.stringify(measuredData.exception.message);
 
-                this[failedLevel](message);
+                    this[failedLevel](message);
+                }
+
+                throw measuredData.exception;
             }
 
-            throw measuredData.exception;
-        }
+            process.stdout.write(`${done} ${time}\n`);
+            Logger.setLock(false);
+        } else {
+            if ("exception" in measuredData) {
+                Logger.buffer.push(`failed. ${time}\n`);
+                throw measuredData.exception;
+            }
 
-        process.stdout.write(`${done} ${time}\n`);
-        Logger.setLock(false);
+            Logger.buffer.push(`${done} ${time}\n`);
+        }
 
         return measuredData.data;
     };

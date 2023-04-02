@@ -1,4 +1,4 @@
-import { Arg, buildSchema, Ctx, Query, Resolver } from "type-graphql";
+import { buildSchema } from "type-graphql";
 import type { GraphQLSchema } from "graphql/type";
 import http from "http";
 import express from "express";
@@ -8,9 +8,7 @@ import { ApolloServerPluginDrainHttpServer } from "apollo-server-core";
 
 import { ResolverPair } from "@resolver";
 import BaseServer from "@server/base";
-
-import iterate from "@utils/iterate";
-import { Album, Artist, Music, SearchInput, SearchOutput } from "@utils/types";
+import GraphQLResolver from "@server/graphql/resolver";
 
 export interface GraphQLServerOptions {
     port: number;
@@ -21,7 +19,6 @@ export interface GraphQLContext {
     resolvers: ReadonlyArray<ResolverPair>;
 }
 
-@Resolver()
 export default class GraphQLServer extends BaseServer<"GraphQL", GraphQLServerOptions> {
     private schema: GraphQLSchema | null = null;
 
@@ -39,7 +36,7 @@ export default class GraphQLServer extends BaseServer<"GraphQL", GraphQLServerOp
 
     public async start(): Promise<void> {
         this.schema = await buildSchema({
-            resolvers: [GraphQLServer],
+            resolvers: [GraphQLResolver],
             validate: {
                 forbidUnknownValues: false,
             },
@@ -71,46 +68,5 @@ export default class GraphQLServer extends BaseServer<"GraphQL", GraphQLServerOp
                 resolve();
             });
         });
-    }
-
-    @Query(() => [Music])
-    private async searchMusics(@Arg("input") input: SearchInput, @Ctx() context: GraphQLContext): Promise<Music[]> {
-        const result = await iterate(
-            context.resolvers.map(([, resolver]) => resolver),
-            resolver => resolver.searchMusics(input.query, input.limit),
-        );
-
-        return result.flatMap(musics => musics);
-    }
-    @Query(() => [Album])
-    private async searchAlbums(@Arg("input") input: SearchInput, @Ctx() context: GraphQLContext): Promise<Album[]> {
-        const result = await iterate(
-            context.resolvers.map(([, resolver]) => resolver),
-            resolver => resolver.searchAlbums(input.query, input.limit),
-        );
-
-        return result.flatMap(albums => albums);
-    }
-    @Query(() => [Artist])
-    private async searchArtists(@Arg("input") input: SearchInput, @Ctx() context: GraphQLContext): Promise<Artist[]> {
-        const result = await iterate(
-            context.resolvers.map(([, resolver]) => resolver),
-            resolver => resolver.searchArtists(input.query, input.limit),
-        );
-
-        return result.flatMap(artists => artists);
-    }
-    @Query(() => SearchOutput)
-    private async search(@Arg("input") input: SearchInput, @Ctx() context: GraphQLContext): Promise<SearchOutput> {
-        const result = await iterate(
-            context.resolvers.map(([, resolver]) => resolver),
-            resolver => resolver.search(input.query, input.limit),
-        );
-
-        return {
-            musics: result.flatMap(item => item.musics),
-            albums: result.flatMap(item => item.albums),
-            artists: result.flatMap(item => item.artists),
-        };
     }
 }

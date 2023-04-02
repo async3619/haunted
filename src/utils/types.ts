@@ -1,46 +1,94 @@
-export interface Music {
-    title: string;
-    artists: string[];
-    album: string;
-    albumArtists: string[];
-    duration: number;
-    track: number;
-    disc: number;
-    year: number;
+import { Field, InputType, Int, ObjectType } from "type-graphql";
+
+@ObjectType()
+export class Music {
+    @Field(() => String)
+    public title!: string;
+
+    @Field(() => [String])
+    public artists!: string[];
+
+    @Field(() => String)
+    public album!: string;
+
+    @Field(() => String)
+    public albumArtists!: string[];
+
+    @Field(() => Int)
+    public duration!: number;
+
+    @Field(() => Int)
+    public track!: number;
+
+    @Field(() => Int)
+    public disc!: number;
+
+    @Field(() => Int)
+    public year!: number;
 }
 
-export interface Image {
-    url: string;
-    width?: number;
-    height?: number;
+@ObjectType()
+export class Image {
+    @Field(() => String)
+    public url!: string;
+
+    @Field(() => Int, { nullable: true })
+    public width?: number;
+
+    @Field(() => Int, { nullable: true })
+    public height?: number;
 }
 
-export interface Album {
-    title: string;
-    artists: string[];
-    releaseDate: string;
-    trackCount: number;
-    albumArts: Image[];
+@ObjectType()
+export class Album {
+    @Field(() => String)
+    public title!: string;
+
+    @Field(() => [String])
+    public artists!: string[];
+
+    @Field(() => String)
+    public releaseDate!: string;
+
+    @Field(() => Int)
+    public trackCount!: number;
+
+    @Field(() => [Image])
+    public albumArts!: Image[];
 }
 
-export interface Artist {
-    name: string;
-    artistImage: Image[];
+@ObjectType()
+export class Artist {
+    @Field(() => String)
+    public name!: string;
+
+    @Field(() => [Image])
+    public artistImages!: Image[];
 }
 
-export interface SearchInput {
-    query: string;
-    limit?: number;
+@InputType()
+export class SearchInput {
+    @Field(() => String)
+    public query!: string;
+
+    @Field(() => Int, { nullable: true })
+    public limit?: number;
 }
 
 export type SearchMusicsOutput = Music[];
 export type SearchAlbumsOutput = Album[];
 export type SearchArtistsOutput = Artist[];
 
-export interface SearchOutput {
-    musics: SearchMusicsOutput;
-    albums: SearchAlbumsOutput;
-    artists: SearchArtistsOutput;
+@ObjectType()
+export class SearchOutput {
+    @Field(() => [Music])
+    public musics!: SearchMusicsOutput;
+
+    @Field(() => [Album])
+    public albums!: SearchAlbumsOutput;
+
+    @Field(() => [Artist])
+    public artists!: SearchArtistsOutput;
 }
 
 export type Fn<TArgs = void, TReturn = void> = TArgs extends void

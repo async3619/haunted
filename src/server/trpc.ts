@@ -1,16 +1,22 @@
 import { createAssert } from "typia";
+import express from "express";
+import * as http from "http";
 
 import { initTRPC } from "@trpc/server";
-import { createHTTPServer } from "@trpc/server/adapters/standalone";
+import * as trpcExpress from "@trpc/server/adapters/express";
 
-import { ResolverPair } from "@resolver";
 import BaseServer from "@server/base";
 
-import { SearchAlbumsOutput, SearchOutput, SearchArtistsOutput, SearchInput, SearchMusicsOutput } from "@utils/types";
+import { ResolverPair } from "@resolver";
 
-export default class TRPCServer extends BaseServer {
-    private readonly resolvers: ResolverPair[];
+import iterate from "@utils/iterate";
+import { SearchOutput, SearchInput, Music, Album, Artist } from "@utils/types";
 
+interface TRPCServerOptions {
+    port: number;
+}
+
+export default class TRPCServer extends BaseServer<"TRPC", TRPCServerOptions> {
     protected readonly t = initTRPC.create();
     protected readonly rootRouter = this.t.router({
         search: this.t.procedure.input(createAssert<SearchInput>()).query(({ input }) => this.search(input)),
@@ -28,57 +34,76 @@ export default class TRPCServer extends BaseServer {
             .query(({ input }) => this.searchArtists(input)),
     });
 
-    public constructor(resolvers: ResolverPair[]) {
-        super();
+    private express: express.Express | null = null;
+    private server: http.Server | null = null;
 
-        this.resolvers = resolvers;
+    public constructor(options: TRPCServerOptions, resolvers: ReadonlyArray<ResolverPair>) {
+        super("TRPC", options, resolvers);
     }
 
-    public async start(port: number) {
-        createHTTPServer({
-            router: this.rootRouter,
-        }).listen(port);
+    public isRunning() {
+        return !!this.server && this.server.listening;
     }
 
-    private async search(input: SearchInput): Promise<SearchOutput> {
-        const results: SearchOutput[] = [];
-        for (const resolver of this.resolvers) {
-            const result = await resolver[1].search(input.query, input.limit);
-            results.push(result);
+    public start() {
+        this.express = express();
+        this.express.use("/", trpcExpress.createExpressMiddleware({ router: this.rootRouter }));
+
+        const expressInstance = this.express;
+        return new Promise<void>(resolve => {
+            this.server = expressInstance.listen(this.options.port, () => {
+                resolve();
+            });
+        });
+    }
+    public async stop() {
+        const server = this.server;
+        if (!server) {
+            throw new Error("TRPCServer has not been started yet");
         }
+
+        return new Promise<void>(resolve => {
+            server.close(() => {
+                resolve();
+            });
+        });
+    }
+
+    private async searchMusics(input: SearchInput): Promise<Music[]> {
+        const result = await iterate(
+            this.resolvers.map(([, resolver]) => resolver),
+            resolver => resolver.searchMusics(input.query, input.limit),
+        );
+
+        return result.flatMap(musics => musics);
+    }
+    private async searchAlbums(input: SearchInput): Promise<Album[]> {
+        const result = await iterate(
+            this.resolvers.map(([, resolver]) => resolver),
+            resolver => resolver.searchAlbums(input.query, input.limit),
+        );
+
+        return result.flatMap(albums => albums);
+    }
+    private async searchArtists(input: SearchInput): Promise<Artist[]> {
+        const result = await iterate(
+            this.resolvers.map(([, resolver]) => resolver),
+            resolver => resolver.searchArtists(input.query, input.limit),
+        );
+
+        return result.flatMap(artists => artists);
+    }
+    private async search(input: SearchInput): Promise<SearchOutput> {
+        const result = await iterate(
+            this.resolvers.map(([, resolver]) => resolver),
+            resolver => resolver.search(input.query, input.limit),
+        );
 
         return {
-            musics: results.flatMap(item => item.musics),
-            albums: results.flatMap(item => item.albums),
-            artists: results.flatMap(item => item.artists),
+            musics: result.flatMap(item => item.musics),
+            albums: result.flatMap(item => item.albums),
+            artists: result.flatMap(item => item.artists),
         };
-    }
-    private async searchMusics(input: SearchInput): Promise<SearchMusicsOutput> {
-        const results: SearchMusicsOutput[] = [];
-        for (const resolver of this.resolvers) {
-            const result = await resolver[1].searchMusics(input.query, input.limit);
-            results.push(result);
-        }
-
-        return results.flatMap(item => item);
-    }
-    private async searchAlbums(input: SearchInput): Promise<SearchAlbumsOutput> {
-        const results: SearchAlbumsOutput[] = [];
-        for (const resolver of this.resolvers) {
-            const result = await resolver[1].searchAlbums(input.query, input.limit);
-            results.push(result);
-        }
-
-        return results.flatMap(item => item);
-    }
-    private async searchArtists(input: SearchInput): Promise<SearchArtistsOutput> {
-        const results: SearchArtistsOutput[] = [];
-        for (const resolver of this.resolvers) {
-            const result = await resolver[1].searchArtists(input.query, input.limit);
-            results.push(result);
-        }
-
-        return results.flatMap(item => item);
     }
 }
 

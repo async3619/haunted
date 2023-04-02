@@ -1,6 +1,6 @@
-import chalk from "chalk";
+import "reflect-metadata";
 
-import Trpc from "@server/trpc";
+import chalk from "chalk";
 
 import Config from "@utils/config";
 import Logger from "@utils/logger";
@@ -15,19 +15,23 @@ export default class App {
         for (const [, resolver] of config.resolvers) {
             await this.logger.task({
                 level: "info",
-                message: `initialize '${chalk.green(resolver.getName())}' watcher`,
+                message: `Initialize '${chalk.green(resolver.getName())}' resolver`,
                 task: () => resolver.initialize(),
             });
         }
 
-        return new App(config, new Trpc(config.resolvers));
+        return new App(config);
     }
 
-    private constructor(private readonly config: Config, private readonly server: Trpc) {}
+    private constructor(private readonly config: Config) {}
 
     public async start() {
-        await this.server.start(this.config.port);
-
-        App.logger.info(`Server started at port ${this.config.port}`);
+        for (const [, server] of this.config.servers) {
+            await App.logger.task({
+                level: "info",
+                message: `Start '${chalk.green(server.getName())}' server`,
+                task: () => server.run(),
+            });
+        }
     }
 }

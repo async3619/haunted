@@ -50,13 +50,13 @@ describe("Config", () => {
 
     it("it should instantiate resolvers from config", async () => {
         const configData: ConfigData = {
-            port: 3000,
             resolvers: {
                 spotify: {
                     clientId: "MOCK_CLIENT_ID",
                     clientSecret: "MOCK_CLIENT_SECRET",
                 },
             },
+            servers: {},
         };
 
         mockedFs.existsSync.mockReturnValue(true);

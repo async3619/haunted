@@ -62,7 +62,7 @@ export default class SpotifyResolver extends BaseResolver<"Spotify", SpotifyReso
             })),
             artists: body.artists.items.map(item => ({
                 name: item.name,
-                artistImage: item.images.map(item => ({
+                artistImages: item.images.map(item => ({
                     url: item.url,
                     width: item.width,
                     height: item.height,
@@ -115,7 +115,7 @@ export default class SpotifyResolver extends BaseResolver<"Spotify", SpotifyReso
 
         return body.artists.items.map(item => ({
             name: item.name,
-            artistImage: item.images.map(item => ({
+            artistImages: item.images.map(item => ({
                 url: item.url,
                 width: item.width,
                 height: item.height,

@@ -1,3 +1,5 @@
+import "reflect-metadata";
+
 import * as path from "path";
 import fs from "fs-extra";
 import Ajv from "ajv";
@@ -7,17 +9,18 @@ import betterAjvErrors from "better-ajv-errors";
 import { dereference } from "@apidevtools/json-schema-ref-parser";
 
 import { createResolver, ResolverMap, ResolverOptionsMap, ResolverPair, ResolverTypes } from "@resolver";
+import { createServer, ServerOptions, ServerOptionsMap, ServerPair, ServerTypes } from "@server";
 
 import Logger from "@utils/logger";
 
 export const DEFAULT_CONFIG: ConfigData = {
-    port: 3000,
     resolvers: {},
+    servers: {},
 };
 
 export interface ConfigData {
-    port: number;
     resolvers: Partial<ResolverOptionsMap>;
+    servers: Partial<ServerOptionsMap>;
 }
 
 const ajv = new Ajv({ allErrors: true, strict: false });
@@ -84,17 +87,26 @@ export default class Config {
             resolvers.push([type, watcher]);
         }
 
-        if (process.env.NODE_ENV === "development") {
-            await Config.dumpConfigSchema("./haunted.schema.json");
+        const serverTypes = Object.keys(config.servers) as ServerTypes[];
+        const servers: ServerPair[] = [];
+        for (const type of serverTypes) {
+            const configs = config.servers[type];
+            if (!configs) {
+                throw new Error(`server \`${type}\` is not configured.`);
+            }
+
+            const server = createServer(type, configs, resolvers);
+            servers.push([type, server]);
         }
 
-        return new Config(Object.fromEntries(resolvers), resolvers, config);
+        return new Config(Object.fromEntries(resolvers), resolvers, Object.fromEntries(servers), servers);
     }
 
     private constructor(
         private readonly allResolverMap: Partial<ResolverMap>,
         private readonly allResolvers: ResolverPair[],
-        private readonly rawConfig: ConfigData,
+        private readonly allServerMap: Partial<ServerOptions>,
+        private readonly allServers: ServerPair[],
     ) {}
 
     public get resolverMap() {
@@ -106,7 +118,12 @@ export default class Config {
         return [...this.allResolvers];
     }
 
-    public get port() {
-        return this.rawConfig.port;
+    public get serverMap() {
+        return {
+            ...this.allServerMap,
+        };
+    }
+    public get servers() {
+        return [...this.allServers];
     }
 }

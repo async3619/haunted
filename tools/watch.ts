@@ -38,7 +38,7 @@ async function reportWatchStatusChanged(
     errorCount?: number,
 ) {
     if (startCompilingCode.includes(diagnostic.code)) {
-        console.clear();
+        process.stdout.write("\x1Bc");
     }
 
     // on error

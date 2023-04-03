@@ -1,4 +1,4 @@
-import Logger from "@utils/logger";
+import { Logger } from "@nestjs/common";
 
 export abstract class Loggable<TName extends string = string> {
     protected readonly logger: Logger;

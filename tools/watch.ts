@@ -7,8 +7,6 @@ import { flushDiagnostics, formatDiagnostic, reportDiagnostic } from "./utils/di
 import { treeKillSync } from "./utils/process";
 import printLog from "./utils/printLog";
 
-import pkg from "../package.json";
-
 function watchMain() {
     const configPath = tts.findConfigFile("./", ts.sys.fileExists, "tsconfig.build.json");
     if (!configPath) {
@@ -86,7 +84,7 @@ function onBuildComplete() {
 }
 
 function spawnProcess() {
-    let outputFilePath = pkg.main;
+    let outputFilePath = "dist/main.js";
     let childProcessArgs: string[] = [];
     const argsStartIndex = process.argv.indexOf("--");
     if (argsStartIndex >= 0) {
@@ -95,10 +93,14 @@ function spawnProcess() {
 
     outputFilePath = outputFilePath.indexOf(" ") >= 0 ? `"${outputFilePath}"` : outputFilePath;
 
-    return spawn("node", ["-r dotenv/config", outputFilePath, ...childProcessArgs], {
+    return spawn("node", [outputFilePath, ...childProcessArgs], {
         stdio: "inherit",
         shell: true,
         cwd: process.cwd(),
+        env: {
+            ...process.env,
+            NODE_ENV: "development",
+        },
     });
 }
 

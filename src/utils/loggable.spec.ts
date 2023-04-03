@@ -1,27 +1,23 @@
 import { Loggable } from "@utils/loggable";
 
 describe("Loggable", () => {
-    it("should be able to be instantiated", () => {
-        class Test extends Loggable {
-            public constructor() {
-                super("Test");
-            }
+    let loggable: Loggable;
+
+    class MockedClass extends Loggable<"Mocked"> {
+        public constructor() {
+            super("Mocked");
         }
+    }
 
-        const test = new Test();
-
-        expect(test).toBeInstanceOf(Test);
+    beforeEach(() => {
+        loggable = new MockedClass();
     });
 
-    it("should be able to get name", () => {
-        class Test extends Loggable {
-            public constructor() {
-                super("Test");
-            }
-        }
+    it("should be defined", () => {
+        expect(loggable).toBeDefined();
+    });
 
-        const test = new Test();
-
-        expect(test.getName()).toBe("Test");
+    it("should be able to get the name", () => {
+        expect(loggable.getName()).toBe("Mocked");
     });
 });

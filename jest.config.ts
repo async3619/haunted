@@ -3,7 +3,7 @@ import { compilerOptions } from "./tsconfig.json";
 
 const jestConfig: JestConfigWithTsJest = {
     moduleFileExtensions: ["js", "json", "ts"],
-    rootDir: "./src",
+    rootDir: "./",
     testRegex: ".*\\.spec\\.ts$",
     transform: {
         "^.+\\.(t|j)s$": [
@@ -13,8 +13,8 @@ const jestConfig: JestConfigWithTsJest = {
             },
         ],
     },
-    collectCoverageFrom: ["**/*.ts", "!index.ts", "!utils/noop.ts", "!**/node_modules/**"],
-    coverageDirectory: "../coverage",
+    collectCoverageFrom: ["src/**/*.ts", "!index.ts", "!utils/noop.ts", "!**/node_modules/**", "!src/main.ts"],
+    coverageDirectory: "./coverage",
     testEnvironment: "node",
     roots: ["<rootDir>"],
     modulePaths: [compilerOptions.baseUrl], // <-- This will be set to 'baseUrl' value

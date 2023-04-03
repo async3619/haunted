@@ -1,16 +1,15 @@
 {
     "compilerOptions": {
-        "strict": true,
         "module": "commonjs",
         "declaration": true,
         "removeComments": true,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "allowSyntheticDefaultImports": true,
-        "target": "ES2018",
+        "target": "es2018",
         "sourceMap": true,
         "outDir": "./dist",
-        "baseUrl": "./src",
+        "baseUrl": "./",
         "incremental": true,
         "skipLibCheck": true,
         "strictNullChecks": true,
@@ -18,17 +17,20 @@
         "strictBindCallApply": false,
         "forceConsistentCasingInFileNames": false,
         "noFallthroughCasesInSwitch": false,
-        "esModuleInterop": true,
         "resolveJsonModule": true,
-        "plugins": [{ "transform": "typia/lib/transform" }],
+        "esModuleInterop": true,
+        "strict": true,
+        "plugins": [{ "transform": "typia/lib/transform", "functional": true }],
         "paths": {
-            "@root/*": ["./*"],
-            "@utils/*": ["./utils/*"],
-            "@resolver": ["./resolver/index.ts"],
-            "@resolver/*": ["./resolver/*"],
-            "@server": ["./server/index.ts"],
-            "@server/*": ["./server/*"]
+            "@root/*": ["./src/*"],
+            "@config/*": ["./src/config/*"],
+            "@metadata/*": ["./src/metadata/*"],
+            "@track/*": ["./src/track/*"],
+            "@album/*": ["./src/album/*"],
+            "@artist/*": ["./src/artist/*"],
+            "@utils/*": ["./src/utils/*"],
+            "@common/*": ["./src/common/*"],
+            "@test/*": ["./test/*"]
         }
-    },
-    "include": ["tools", "package.json", "src", "jest.config.ts", "**/*.spec.ts"]
+    }
 }

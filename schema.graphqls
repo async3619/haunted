@@ -1,11 +1,8 @@
-type Query {
-  searchMusics(input: SearchInput!): [Music!]!
-  searchAlbums(input: SearchInput!): [Album!]!
-  searchArtists(input: SearchInput!): [Artist!]!
-  search(input: SearchInput!): SearchOutput!
-}
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
 
-type Music {
+type Track {
   title: String!
   artists: [String!]!
   album: String!
@@ -13,20 +10,7 @@ type Music {
   duration: Int!
   track: Int!
   disc: Int!
-  year: Int!
-}
-
-input SearchInput {
-  query: String!
-  limit: Int
-}
-
-type Album {
-  title: String!
-  artists: [String!]!
-  releaseDate: String!
-  trackCount: Int!
-  albumArts: [Image!]!
+  year: String!
 }
 
 type Image {
@@ -40,8 +24,28 @@ type Artist {
   artistImages: [Image!]!
 }
 
-type SearchOutput {
-  musics: [Music!]!
+type Album {
+  title: String!
+  artists: [String!]!
+  releaseDate: String!
+  trackCount: Int!
+  albumArts: [Image!]!
+}
+
+type SearchResult {
+  tracks: [Track!]!
   albums: [Album!]!
   artists: [Artist!]!
+}
+
+type Query {
+  search(input: SearchInput!): SearchResult!
+  searchAlbums(input: SearchInput!): [Album!]!
+  searchTrack(input: SearchInput!): [Track!]!
+  searchArtists(input: SearchInput!): [Artist!]!
+}
+
+input SearchInput {
+  query: String!
+  limit: Int
 }

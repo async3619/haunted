@@ -32,7 +32,7 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
         this.client.setAccessToken(access_token);
     }
 
-    public async searchTrack({ query, limit = 50 }: SearchInput): Promise<Track[]> {
+    public async searchTrack({ query, limit = 20 }: SearchInput): Promise<Track[]> {
         const { body } = await this.client.search(query, ["track"], {
             limit,
         });
@@ -43,7 +43,7 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
 
         return body.tracks.items.map(this.convertTrack);
     }
-    public async searchAlbum({ query, limit = 50 }: SearchInput): Promise<Album[]> {
+    public async searchAlbum({ query, limit = 20 }: SearchInput): Promise<Album[]> {
         const { body } = await this.client.search(query, ["album"], {
             limit,
         });
@@ -58,7 +58,7 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
 
         return albums.map(this.convertAlbum);
     }
-    public async searchArtist({ query, limit = 50 }: SearchInput): Promise<Artist[]> {
+    public async searchArtist({ query, limit = 20 }: SearchInput): Promise<Artist[]> {
         const { body } = await this.client.search(query, ["artist"], {
             limit,
         });

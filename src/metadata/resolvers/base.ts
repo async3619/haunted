@@ -2,8 +2,8 @@ import _ from "lodash";
 
 import { SearchInput } from "@common/search-input.dto";
 import { Track } from "@common/track.dto";
-import { Album } from "@common/album.dto";
 import { Artist } from "@common/artist.dto";
+import { Album } from "@common/album.dto";
 
 import { Loggable } from "@utils/loggable";
 
@@ -21,6 +21,9 @@ export default abstract class BaseResolver<
 
     public getOptions() {
         return _.cloneDeep(this.options);
+    }
+    public getId(id: string) {
+        return `${this.getName()}::${id}`;
     }
 
     public abstract initialize(): Promise<void>;

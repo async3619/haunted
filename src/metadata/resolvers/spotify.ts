@@ -2,8 +2,8 @@ import SpotifyWebApi from "spotify-web-api-node";
 
 import { SearchInput } from "@common/search-input.dto";
 import { Track } from "@common/track.dto";
-import { Artist } from "@common/artist.dto";
 import { Album } from "@common/album.dto";
+import { Artist } from "@common/artist.dto";
 
 import BaseResolver from "@metadata/resolvers/base";
 
@@ -61,7 +61,32 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
             (locale ? { locale } : {}) as any,
         );
 
-        return albums.map(this.convertAlbum);
+        return albums.map((item, index) => ({
+            uri: super.getId(item.id),
+            resolverName: this.getName(),
+            locale: locale || "default",
+            query,
+            index,
+            title: item.name,
+            artists: item.artists.map(artist => artist.name),
+            albumArts: item.images.map(image => ({
+                url: image.url,
+                width: image.width,
+                height: image.height,
+            })),
+            releaseDate: item.release_date,
+            trackCount: item.total_tracks,
+            tracks: item.tracks.items.map(track => ({
+                title: track.name,
+                artists: track.artists.map(artist => artist.name),
+                track: track.track_number,
+                disc: track.disc_number,
+                duration: track.duration_ms,
+                album: item.name,
+                year: item.release_date,
+                albumArtists: item.artists.map(artist => artist.name),
+            })),
+        }));
     }
     public async searchArtist({ query, limit = 20, locale }: SearchInput): Promise<Artist[]> {
         const { body } = await this.client.search(query, ["artist"], {
@@ -73,7 +98,7 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
             throw new Error("Invalid response from Spotify");
         }
 
-        return body.artists.items.map(this.convertArtist);
+        return body.artists.items.map(item => this.convertArtist(item));
     }
 
     private convertTrack(track: SpotifyApi.TrackObjectFull): Track {
@@ -86,29 +111,6 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
             album: track.album.name,
             year: track.album.release_date,
             albumArtists: track.album.artists.map(artist => artist.name),
-        };
-    }
-    private convertAlbum(album: SpotifyApi.AlbumObjectFull): Album {
-        return {
-            title: album.name,
-            artists: album.artists.map(artist => artist.name),
-            albumArts: album.images.map(image => ({
-                url: image.url,
-                width: image.width,
-                height: image.height,
-            })),
-            releaseDate: album.release_date,
-            trackCount: album.total_tracks,
-            tracks: album.tracks.items.map(track => ({
-                title: track.name,
-                artists: track.artists.map(artist => artist.name),
-                track: track.track_number,
-                disc: track.disc_number,
-                duration: track.duration_ms,
-                album: album.name,
-                year: album.release_date,
-                albumArtists: album.artists.map(artist => artist.name),
-            })),
         };
     }
     private convertArtist(artist: SpotifyApi.ArtistObjectFull): Artist {

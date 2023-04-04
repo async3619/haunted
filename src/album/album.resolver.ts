@@ -1,8 +1,8 @@
 import { Inject } from "@nestjs/common";
 import { Args, Resolver, Query } from "@nestjs/graphql";
 
-import { Album } from "@common/album.dto";
 import { SearchInput } from "@common/search-input.dto";
+import { Album } from "@common/album.dto";
 
 import { AlbumService } from "@album/album.service";
 

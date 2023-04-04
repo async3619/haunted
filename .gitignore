@@ -38,3 +38,5 @@ lerna-debug.log*
 /.env.test
 /coverage-e2e
 /coverage-merged
+
+/database.sqlite

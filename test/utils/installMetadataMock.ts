@@ -17,9 +17,9 @@ export class MockResolver extends BaseResolver<"Mocked", any> {
 
 export function installMetadataMock(metadataService: MetadataService) {
     const mockResolver = new MockResolver();
-    jest.spyOn(metadataService, "getResolvers").mockImplementation(() => {
-        return [["mocked", mockResolver] as unknown as ResolverPair];
-    });
+    const mockedResolvers = [["mocked", mockResolver] as unknown as ResolverPair];
+
+    jest.spyOn(metadataService, "getResolvers").mockImplementation(() => mockedResolvers);
 
     return mockResolver;
 }

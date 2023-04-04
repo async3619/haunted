@@ -36,7 +36,7 @@ export class MetadataService implements OnModuleInit {
 
     public async search(input: SearchInput): Promise<SearchResult> {
         const results: SearchResult[] = [];
-        for (const [, resolver] of this.resolvers) {
+        for (const [, resolver] of this.getResolvers()) {
             results.push(await resolver.search(input));
         }
 

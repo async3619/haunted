@@ -67,3 +67,15 @@ This server uses `config.json` file from current working directory. we provide t
     }
 }
 ```
+## 🎵 Resolvers
+
+Currently, this server supports Spotify resolver only. but we are planning to add more resolvers in the future.
+
+### Supported Resolvers
+
+| Service       | Support? |
+|---------------|:--------:|
+| Spotify       |    ✅     |
+| YouTube Music |    ❌     |
+| Apple Music   |    ❌     |
+| Deezer        |    ❌     |

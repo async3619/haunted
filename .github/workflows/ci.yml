@@ -46,6 +46,7 @@ jobs:
 
       - name: Test
         run: |
+          yarn ts-node ./tools/writeConfig.ts
           yarn test --coverage --ci --verbose --testTimeout=20000
           yarn test:e2e --coverage --ci --verbose --testTimeout=20000
           yarn coverage

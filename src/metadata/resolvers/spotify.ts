@@ -32,9 +32,10 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
         this.client.setAccessToken(access_token);
     }
 
-    public async searchTrack({ query, limit = 20 }: SearchInput): Promise<Track[]> {
+    public async searchTrack({ query, limit = 20, locale }: SearchInput): Promise<Track[]> {
         const { body } = await this.client.search(query, ["track"], {
             limit,
+            ...(locale ? { locale } : {}),
         });
 
         if (!body.tracks) {
@@ -43,9 +44,10 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
 
         return body.tracks.items.map(this.convertTrack);
     }
-    public async searchAlbum({ query, limit = 20 }: SearchInput): Promise<Album[]> {
+    public async searchAlbum({ query, limit = 20, locale }: SearchInput): Promise<Album[]> {
         const { body } = await this.client.search(query, ["album"], {
             limit,
+            ...(locale ? { locale } : {}),
         });
 
         if (!body.albums) {
@@ -54,13 +56,17 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
 
         const {
             body: { albums },
-        } = await this.client.getAlbums(body.albums.items.map(album => album.id));
+        } = await this.client.getAlbums(
+            body.albums.items.map(album => album.id),
+            (locale ? { locale } : {}) as any,
+        );
 
         return albums.map(this.convertAlbum);
     }
-    public async searchArtist({ query, limit = 20 }: SearchInput): Promise<Artist[]> {
+    public async searchArtist({ query, limit = 20, locale }: SearchInput): Promise<Artist[]> {
         const { body } = await this.client.search(query, ["artist"], {
             limit,
+            ...(locale ? { locale } : {}),
         });
 
         if (!body.artists) {

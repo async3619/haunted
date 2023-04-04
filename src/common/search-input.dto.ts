@@ -10,4 +10,7 @@ export class SearchInput {
     @Max(20)
     @Field(() => Int, { nullable: true })
     public limit?: number;
+
+    @Field(() => String, { nullable: true })
+    public locale?: string;
 }

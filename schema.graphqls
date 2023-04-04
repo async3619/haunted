@@ -42,4 +42,5 @@ type Query {
 input SearchInput {
   query: String!
   limit: Int
+  locale: String
 }

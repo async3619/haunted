@@ -24,7 +24,7 @@ describe("Album (e2e)", () => {
         await app.close();
     });
 
-    describe("searchTracks", () => {
+    describe("searchAlbums", () => {
         it("should be able to search albums", async () => {
             return pactum
                 .spec()

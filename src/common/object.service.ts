@@ -5,20 +5,32 @@ import { SearchInput } from "@common/search-input.dto";
 
 import { CacheStorage } from "@utils/cache";
 import { AsyncFn } from "@utils/types";
+import { ConfigService } from "@config/config.service";
+import { OnModuleInit } from "@nestjs/common";
 
 interface SearchInputData extends SearchInput {
     resolver: BaseResolver<string, any>;
 }
 
-export class ObjectService<TItem> {
+export class ObjectService<TItem> implements OnModuleInit {
     private readonly searchCache = new CacheStorage<SearchInputData, TItem[]>({
         keyBuilder: ({ resolver, locale, limit, query }) => `${resolver.getName()}_${locale}_${limit}_${query}`,
     });
 
-    protected constructor(
+    constructor(
         private readonly metadata: MetadataService,
+        private readonly config: ConfigService,
         private readonly searchFn: AsyncFn<SearchInputData, TItem[]>,
     ) {}
+
+    public onModuleInit() {
+        const config = this.config.getConfig();
+        if (typeof config.cacheTTL !== "number") {
+            return;
+        }
+
+        this.searchCache.setTimeToLive(config.cacheTTL);
+    }
 
     public async search(input: SearchInput) {
         const results: TItem[] = [];

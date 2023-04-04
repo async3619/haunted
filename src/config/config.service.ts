@@ -11,6 +11,7 @@ import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { ResolverOptionsMap } from "@metadata/resolvers";
 
 export type ConfigData = {
+    cacheTTL?: number;
     resolvers: Partial<ResolverOptionsMap>;
 };
 

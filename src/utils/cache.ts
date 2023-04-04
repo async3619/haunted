@@ -14,10 +14,13 @@ export interface CacheStorageOptions<TKey> {
 export class CacheStorage<TKey, TValue> {
     private readonly container = new Map<string, CacheItem<TKey, TValue>>();
     private readonly keyBuilder: Fn<[TKey], string>;
-    private readonly timeToLive: number;
+    private timeToLive: number;
 
     public constructor(options?: CacheStorageOptions<TKey>) {
         const { keyBuilder, timeToLive = 3600 } = options || {};
+        if (timeToLive <= 0) {
+            throw new Error("Time to live must be greater than 0");
+        }
 
         this.keyBuilder = keyBuilder || ((key: TKey) => `${key}`);
         this.timeToLive = timeToLive;
@@ -25,6 +28,14 @@ export class CacheStorage<TKey, TValue> {
 
     public get length() {
         return this.container.size;
+    }
+
+    public setTimeToLive(timeToLive: number) {
+        if (timeToLive <= 0) {
+            throw new Error("Time to live must be greater than 0");
+        }
+
+        this.timeToLive = timeToLive;
     }
 
     private isAlive(item: CacheItem<TKey, TValue>) {

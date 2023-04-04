@@ -1,6 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 
 import { MetadataModule } from "@metadata/metadata.module";
+import { ConfigModule } from "@config/config.module";
 
 import { ArtistResolver } from "@artist/artist.resolver";
 import { ArtistService } from "@artist/artist.service";
@@ -13,7 +14,7 @@ describe("ArtistResolver", () => {
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            imports: [MetadataModule],
+            imports: [MetadataModule, ConfigModule],
             providers: [ArtistResolver, ArtistService],
         }).compile();
 

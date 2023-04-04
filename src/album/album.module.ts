@@ -1,12 +1,13 @@
 import { Module } from "@nestjs/common";
 
 import { MetadataModule } from "@metadata/metadata.module";
+import { ConfigModule } from "@config/config.module";
 
 import { AlbumService } from "@album/album.service";
 import { AlbumResolver } from "@album/album.resolver";
 
 @Module({
-    imports: [MetadataModule],
+    imports: [MetadataModule, ConfigModule],
     providers: [AlbumResolver, AlbumService],
 })
 export class AlbumModule {}

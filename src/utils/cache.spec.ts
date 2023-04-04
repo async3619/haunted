@@ -74,4 +74,24 @@ describe("Cache", () => {
 
         expect(cache.get("test3")).toBe(null);
     });
+
+    it("should be able to set time to live", async () => {
+        const cache = new CacheStorage<string, number>();
+        cache.setTimeToLive(1);
+        expect(cache["timeToLive"]).toBe(1);
+
+        cache.set("test", 1);
+        expect(cache.exists("test")).toBe(true);
+
+        await sleep(2000);
+        expect(cache.exists("test")).toBe(false);
+    });
+
+    it("should throw if time to life is invalid", () => {
+        const cache = new CacheStorage<string, number>();
+        expect(() => cache.setTimeToLive(0)).toThrow();
+        expect(() => cache.setTimeToLive(-1)).toThrow();
+        expect(() => new CacheStorage<string, number>({ timeToLive: 0 })).toThrow();
+        expect(() => new CacheStorage<string, number>({ timeToLive: -1 })).toThrow();
+    });
 });

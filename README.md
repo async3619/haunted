@@ -24,4 +24,46 @@
 
 ## 📖 About
 
-Haunted is music metadata retrieving server for [Cruise](https://github.com/async3619/cruise).
+Haunted is music metadata retrieving server. this server retrieves metadata from several sources and serves it to client.
+
+This server is mainly used for [Cruise](https://github.com/async3619/cruise). but you can use it for everything you want.
+
+## 🚀 Getting Started
+
+### 📦 Using Docker
+
+```bash
+docker run -d -p 3000:3000 async3619/haunted
+```
+
+### 📦 Using Docker Compose
+
+```yaml
+version: "3.7"
+
+services:
+    haunted:
+        image: async3619/haunted
+        ports:
+            - "3000:3000"
+        volumes:
+            - ./config.json:/home/node/config.json:ro
+```
+
+## 🛠️ Configuration
+
+This server uses `config.json` file from current working directory. we provide the configuration schema in 
+`config.schema.json` file. you can use this file to validate your configuration file in your IDE.
+
+```json5
+{
+    "cacheTTL": 3600, // cache TTL in seconds
+    "resolvers": {
+        // whatever resolvers you want to use
+        "spotify": {
+            "clientId": "<your spotify client id>",
+            "clientSecret": "<your spotify client secret>"
+        },
+    }
+}
+```

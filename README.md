@@ -36,7 +36,7 @@ This server is mainly used for [Cruise](https://github.com/async3619/cruise). bu
 ### 📦 Using Docker
 
 ```bash
-docker run -d -p 3000:3000 async3619/haunted
+docker run -d -p 3000:3000 async3619/haunted:latest
 ```
 
 ### 📦 Using Docker Compose
@@ -46,7 +46,7 @@ version: "3.7"
 
 services:
     haunted:
-        image: async3619/haunted
+        image: async3619/haunted:latest
         ports:
             - "3000:3000"
         volumes:

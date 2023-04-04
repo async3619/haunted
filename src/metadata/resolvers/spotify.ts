@@ -52,7 +52,11 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
             throw new Error("Invalid response from Spotify");
         }
 
-        return body.albums.items.map(this.convertAlbum);
+        const {
+            body: { albums },
+        } = await this.client.getAlbums(body.albums.items.map(album => album.id));
+
+        return albums.map(this.convertAlbum);
     }
     public async searchArtist({ query, limit = 50 }: SearchInput): Promise<Artist[]> {
         const { body } = await this.client.search(query, ["artist"], {
@@ -78,7 +82,7 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
             albumArtists: track.album.artists.map(artist => artist.name),
         };
     }
-    private convertAlbum(album: SpotifyApi.AlbumObjectSimplified): Album {
+    private convertAlbum(album: SpotifyApi.AlbumObjectFull): Album {
         return {
             title: album.name,
             artists: album.artists.map(artist => artist.name),
@@ -89,6 +93,16 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
             })),
             releaseDate: album.release_date,
             trackCount: album.total_tracks,
+            tracks: album.tracks.items.map(track => ({
+                title: track.name,
+                artists: track.artists.map(artist => artist.name),
+                track: track.track_number,
+                disc: track.disc_number,
+                duration: track.duration_ms,
+                album: album.name,
+                year: album.release_date,
+                albumArtists: album.artists.map(artist => artist.name),
+            })),
         };
     }
     private convertArtist(artist: SpotifyApi.ArtistObjectFull): Artist {

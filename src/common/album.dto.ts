@@ -1,5 +1,6 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
 import { Image } from "@common/image.dto";
+import { Track } from "@common/track.dto";
 
 @ObjectType()
 export class Album {
@@ -17,4 +18,7 @@ export class Album {
 
     @Field(() => [Image])
     public albumArts!: Image[];
+
+    @Field(() => [Track])
+    public tracks!: Track[];
 }

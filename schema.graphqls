@@ -8,14 +8,6 @@ type Image {
   height: Int
 }
 
-type Album {
-  title: String!
-  artists: [String!]!
-  releaseDate: String!
-  trackCount: Int!
-  albumArts: [Image!]!
-}
-
 type Track {
   title: String!
   artists: [String!]!
@@ -25,6 +17,15 @@ type Track {
   track: Int!
   disc: Int!
   year: String!
+}
+
+type Album {
+  title: String!
+  artists: [String!]!
+  releaseDate: String!
+  trackCount: Int!
+  albumArts: [Image!]!
+  tracks: [Track!]!
 }
 
 type Artist {

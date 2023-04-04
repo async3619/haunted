@@ -46,7 +46,9 @@ jobs:
 
       - name: Test
         run: |
-          yarn test --coverage --ci --verbose --testTimeout=10000
+          yarn test --coverage --ci --verbose --testTimeout=20000
+          yarn test:e2e --coverage --ci --verbose --testTimeout=20000
+          yarn coverage
         env:
           SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
           SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
@@ -56,6 +58,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: haunted
+          files: ./coverage-merged/coverage-final.json
 
       - name: Build
         run: |

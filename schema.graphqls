@@ -41,7 +41,7 @@ type SearchResult {
 type Query {
   search(input: SearchInput!): SearchResult!
   searchAlbums(input: SearchInput!): [Album!]!
-  searchTrack(input: SearchInput!): [Track!]!
+  searchTracks(input: SearchInput!): [Track!]!
   searchArtists(input: SearchInput!): [Artist!]!
 }
 

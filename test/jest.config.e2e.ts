@@ -1,10 +1,11 @@
 import { pathsToModuleNameMapper, type JestConfigWithTsJest } from "ts-jest";
-import { compilerOptions } from "./tsconfig.json";
+import { compilerOptions } from "../tsconfig.json";
 
 const jestConfig: JestConfigWithTsJest = {
     moduleFileExtensions: ["js", "json", "ts"],
-    rootDir: "./",
-    testRegex: ".*\\.spec\\.ts$",
+    rootDir: "..",
+    testEnvironment: "node",
+    testRegex: ".e2e-spec.ts$",
     transform: {
         "^.+\\.(t|j)s$": [
             "ts-jest",
@@ -13,9 +14,15 @@ const jestConfig: JestConfigWithTsJest = {
             },
         ],
     },
-    collectCoverageFrom: ["src/**/*.ts", "!index.ts", "!utils/noop.ts", "!**/node_modules/**", "!src/main.ts"],
-    coverageDirectory: "./coverage",
-    testEnvironment: "node",
+    collectCoverageFrom: [
+        "src/**/*.ts",
+        "!index.ts",
+        "!utils/noop.ts",
+        "!**/node_modules/**",
+        "!src/main.ts",
+        "!src/**/*.spec.ts",
+    ],
+    coverageDirectory: "./coverage-e2e",
     roots: ["<rootDir>"],
     modulePaths: [compilerOptions.baseUrl], // <-- This will be set to 'baseUrl' value
     moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: "<rootDir>/" }),

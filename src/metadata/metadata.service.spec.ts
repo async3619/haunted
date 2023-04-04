@@ -32,20 +32,4 @@ describe("MetadataService", () => {
 
         expect(service.getResolvers()).toHaveLength(1);
     });
-
-    it("should be able to search", async () => {
-        await service.onModuleInit();
-        await service.search({
-            query: "Test",
-            limit: 10,
-        });
-
-        const [[, mockedResolver]] = service.getResolvers();
-
-        expect(mockedResolver.search).toBeCalledTimes(1);
-        expect(mockedResolver.search).toBeCalledWith({
-            query: "Test",
-            limit: 10,
-        });
-    });
 });

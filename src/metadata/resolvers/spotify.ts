@@ -1,7 +1,6 @@
 import SpotifyWebApi from "spotify-web-api-node";
 
 import { SearchInput } from "@common/search-input.dto";
-import { SearchResult } from "@common/search-result.dto";
 import { Track } from "@common/track.dto";
 import { Artist } from "@common/artist.dto";
 import { Album } from "@common/album.dto";
@@ -33,21 +32,6 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
         this.client.setAccessToken(access_token);
     }
 
-    public async search({ query, limit = 50 }: SearchInput): Promise<SearchResult> {
-        const { body } = await this.client.search(query, ["track", "album", "artist"], {
-            limit,
-        });
-
-        if (!body.artists || !body.albums || !body.tracks) {
-            throw new Error("Invalid response from Spotify");
-        }
-
-        return {
-            tracks: body.tracks.items.map(this.convertTrack),
-            albums: body.albums.items.map(this.convertAlbum),
-            artists: body.artists.items.map(this.convertArtist),
-        };
-    }
     public async searchTrack({ query, limit = 50 }: SearchInput): Promise<Track[]> {
         const { body } = await this.client.search(query, ["track"], {
             limit,

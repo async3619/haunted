@@ -2,6 +2,20 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Image {
+  url: String!
+  width: Int
+  height: Int
+}
+
+type Album {
+  title: String!
+  artists: [String!]!
+  releaseDate: String!
+  trackCount: Int!
+  albumArts: [Image!]!
+}
+
 type Track {
   title: String!
   artists: [String!]!
@@ -13,33 +27,12 @@ type Track {
   year: String!
 }
 
-type Image {
-  url: String!
-  width: Int
-  height: Int
-}
-
 type Artist {
   name: String!
   artistImages: [Image!]!
 }
 
-type Album {
-  title: String!
-  artists: [String!]!
-  releaseDate: String!
-  trackCount: Int!
-  albumArts: [Image!]!
-}
-
-type SearchResult {
-  tracks: [Track!]!
-  albums: [Album!]!
-  artists: [Artist!]!
-}
-
 type Query {
-  search(input: SearchInput!): SearchResult!
   searchAlbums(input: SearchInput!): [Album!]!
   searchTracks(input: SearchInput!): [Track!]!
   searchArtists(input: SearchInput!): [Artist!]!

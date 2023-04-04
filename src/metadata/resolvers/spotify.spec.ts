@@ -62,19 +62,6 @@ describe("SpotifyResolver", () => {
         expect(result.length).toBeGreaterThan(0);
     });
 
-    it("should be able to search for all", async () => {
-        await resolver.initialize();
-
-        const result = await resolver.search({
-            query: "QM",
-        });
-
-        expect(result).toBeDefined();
-        expect(result.tracks.length).toBeGreaterThan(0);
-        expect(result.albums.length).toBeGreaterThan(0);
-        expect(result.artists.length).toBeGreaterThan(0);
-    });
-
     it("should throw an error when search result is courrupted", async () => {
         await resolver.initialize();
 
@@ -93,6 +80,5 @@ describe("SpotifyResolver", () => {
         await expect(resolver.searchTrack({ query: "" })).rejects.toThrow();
         await expect(resolver.searchAlbum({ query: "" })).rejects.toThrow();
         await expect(resolver.searchArtist({ query: "" })).rejects.toThrow();
-        await expect(resolver.search({ query: "" })).rejects.toThrow();
     });
 });

@@ -1,7 +1,6 @@
 import _ from "lodash";
 
 import { SearchInput } from "@common/search-input.dto";
-import { SearchResult } from "@common/search-result.dto";
 import { Track } from "@common/track.dto";
 import { Album } from "@common/album.dto";
 import { Artist } from "@common/artist.dto";
@@ -26,7 +25,6 @@ export default abstract class BaseResolver<
 
     public abstract initialize(): Promise<void>;
 
-    public abstract search(input: SearchInput): Promise<SearchResult>;
     public abstract searchTrack(input: SearchInput): Promise<Track[]>;
     public abstract searchAlbum(input: SearchInput): Promise<Album[]>;
     public abstract searchArtist(input: SearchInput): Promise<Artist[]>;

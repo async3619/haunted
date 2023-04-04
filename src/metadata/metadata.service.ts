@@ -1,8 +1,5 @@
 import { Inject, Injectable, Logger, OnModuleInit } from "@nestjs/common";
 
-import { SearchResult } from "@common/search-result.dto";
-import { SearchInput } from "@common/search-input.dto";
-
 import { createResolver, ResolverOptions, ResolverPair, ResolverTypes } from "@metadata/resolvers";
 
 import { ConfigService } from "@config/config.service";
@@ -32,18 +29,5 @@ export class MetadataService implements OnModuleInit {
 
     public getResolvers(): ResolverPair[] {
         return [...this.resolvers];
-    }
-
-    public async search(input: SearchInput): Promise<SearchResult> {
-        const results: SearchResult[] = [];
-        for (const [, resolver] of this.getResolvers()) {
-            results.push(await resolver.search(input));
-        }
-
-        return {
-            tracks: results.flatMap(result => result.tracks),
-            albums: results.flatMap(result => result.albums),
-            artists: results.flatMap(result => result.artists),
-        };
     }
 }

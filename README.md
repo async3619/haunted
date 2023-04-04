@@ -16,6 +16,9 @@
     <a href="https://codecov.io/gh/async3619/haunted">
         <img alt="Codecov" src="https://img.shields.io/codecov/c/github/async3619/haunted?style=flat-square&token=DF3uhBCl9j">
     </a>
+    <a href="https://hub.docker.com/r/async3619/haunted">
+        <img alt="Docker Image Version (tag latest semver)" src="https://img.shields.io/docker/v/async3619/haunted/latest?label=docker&style=flat-square">
+    </a>
     <br />
     <sup>Music metadata retrieving server for <a href="https://github.com/async3619/cruise">Cruise</a></sup>
     <br />

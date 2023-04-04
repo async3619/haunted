@@ -1,71 +1,77 @@
 name: Build and Deploy
 
 on:
-  push:
-    branches:
-      - main
-      - dev
+    push:
+        branches:
+            - main
+            - dev
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2.3.1
-        with:
-          persist-credentials: false
+    build-and-deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2.3.1
+              with:
+                  persist-credentials: false
 
-      - name: Cache node_modules
-        id: node-cache
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
-        with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
+            - name: Cache node_modules
+              id: node-cache
+              uses: actions/cache@v2
+              env:
+                  cache-name: cache-node-modules
+              with:
+                  # npm cache files are stored in `~/.npm` on Linux/macOS
+                  path: node_modules
+                  key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-modules-
 
-      - name: Install and Build
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18.x"
+            - name: Install and Build
+              uses: actions/setup-node@v3
+              with:
+                  node-version: "18.x"
 
-      - name: Install yarn
-        run: |
-          npm install -g yarn
+            - name: Install yarn
+              run: |
+                  npm install -g yarn
 
-      - name: Prepare package
-        run: |
-          yarn
+            - name: Prepare package
+              run: |
+                  yarn
 
-      - name: Lint
-        run: |
-          yarn lint
+            - name: Lint
+              run: |
+                  yarn lint
 
-      - name: Test
-        run: |
-          yarn ts-node ./tools/writeConfig.ts
-          yarn test --coverage --ci --verbose --testTimeout=20000
-          yarn test:e2e --coverage --ci --verbose --testTimeout=20000
-          yarn coverage
-        env:
-          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
-          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+            - name: Test
+              run: |
+                  yarn ts-node ./tools/writeConfig.ts
+                  yarn test --coverage --ci --verbose --testTimeout=20000
+                  yarn test:e2e --coverage --ci --verbose --testTimeout=20000
+                  yarn coverage
+              env:
+                  SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+                  SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
 
-      - name: Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          name: haunted
-          files: ./coverage-merged/coverage-final.json
+            - name: Codecov
+              uses: codecov/codecov-action@v3
+              with:
+                  token: ${{ secrets.CODECOV_TOKEN }}
+                  name: haunted
+                  files: ./coverage-merged/coverage-final.json
 
-      - name: Build
-        run: |
-          yarn build
+            - name: Build
+              run: |
+                  yarn build
 
-      - uses: sarisia/actions-status-discord@v1
-        if: always()
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+            - name: Release
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+              run: npx semantic-release
+
+            - uses: sarisia/actions-status-discord@v1
+              if: always()
+              with:
+                  webhook: ${{ secrets.DISCORD_WEBHOOK }}

@@ -1,4 +1,4 @@
-import { Max, Min } from "class-validator";
+import { IsOptional, Max, Min } from "class-validator";
 
 import { Field, InputType, Int } from "@nestjs/graphql";
 
@@ -16,6 +16,7 @@ export class SearchInput {
     @Field(() => Int, { nullable: true })
     @Min(1)
     @Max(20)
+    @IsOptional()
     public limit?: number;
 
     @Field(() => String, { nullable: true })

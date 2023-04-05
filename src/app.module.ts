@@ -23,7 +23,7 @@ import { TRPCServerModule } from "@trpc-server/trpc-server.module";
             useFactory: async (configData: ConfigData) => ({
                 playground: process.env.NODE_ENV === "development",
                 autoSchemaFile: path.join(process.cwd(), "schema.graphqls"),
-                path: configData?.servers?.graphql?.path || "/",
+                path: configData?.servers?.graphql?.path || "/graphql",
             }),
         }),
         TRPCServerModule,

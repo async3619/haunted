@@ -1,5 +1,6 @@
 import path from "path";
 import { SpotifyResolver } from "@metadata/resolvers/spotify";
+import { Request } from "@utils/request";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require("dotenv").config({
@@ -18,6 +19,10 @@ describe("SpotifyResolver", () => {
             clientId: process.env.SPOTIFY_CLIENT_ID,
             clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
         });
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
     });
 
     it("should be defined", () => {
@@ -62,23 +67,43 @@ describe("SpotifyResolver", () => {
         expect(result.length).toBeGreaterThan(0);
     });
 
-    it("should throw an error when search result is courrupted", async () => {
+    it("should throw an error when search result is corrupted", async () => {
+        resolver["request"] = jest.fn().mockResolvedValue({ body: {} });
+
+        await expect(resolver.searchTrack({ query: "" })).rejects.toThrow("Invalid response");
+        await expect(resolver.searchAlbum({ query: "" })).rejects.toThrow("Invalid response");
+        await expect(resolver.searchArtist({ query: "" })).rejects.toThrow("Invalid response");
+    });
+
+    it("should refresh access token automatically when it expires", async () => {
         await resolver.initialize();
 
-        Object.defineProperty(resolver["client"], "search", {
-            value: jest.fn().mockImplementation(() => {
-                return {
-                    body: {
-                        artists: undefined,
-                        albums: undefined,
-                        tracks: undefined,
-                    },
-                };
-            }),
+        jest.spyOn(Request.prototype, "executeJson").mockResolvedValueOnce({
+            headers: {},
+            statusCode: 401,
+            body: {
+                error: {
+                    message: "The access token expired",
+                    status: 401,
+                },
+            },
         });
 
-        await expect(resolver.searchTrack({ query: "" })).rejects.toThrow();
-        await expect(resolver.searchAlbum({ query: "" })).rejects.toThrow();
-        await expect(resolver.searchArtist({ query: "" })).rejects.toThrow();
+        await expect(resolver.searchTrack({ query: "돈숨" })).resolves.not.toThrow();
+    });
+
+    it("should throw an error when api returns an error", async () => {
+        jest.spyOn(Request.prototype, "executeJson").mockResolvedValueOnce({
+            headers: {},
+            statusCode: 400,
+            body: {
+                error: {
+                    message: "Bad request",
+                    status: 400,
+                },
+            },
+        });
+
+        await expect(resolver.searchTrack({ query: "돈숨" })).rejects.toThrow("Bad request (400)");
     });
 });

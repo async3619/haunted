@@ -30,6 +30,7 @@
             "@artist/*": ["./src/artist/*"],
             "@utils/*": ["./src/utils/*"],
             "@common/*": ["./src/common/*"],
+            "@trpc-server/*": ["./src/trpc-server/*"],
             "@test/*": ["./test/*"]
         }
     }

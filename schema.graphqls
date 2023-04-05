@@ -34,8 +34,8 @@ type Artist {
 }
 
 type Query {
-  searchAlbums(input: SearchInput!): [Album!]!
   searchTracks(input: SearchInput!): [Track!]!
+  searchAlbums(input: SearchInput!): [Album!]!
   searchArtists(input: SearchInput!): [Artist!]!
 }
 

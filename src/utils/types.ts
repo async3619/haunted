@@ -5,3 +5,4 @@ export type Fn<TArgs = void, TReturn = void> = TArgs extends void
     ? (...args: TArgs) => TReturn
     : (args: TArgs) => TReturn;
 export type AsyncFn<TArgs = void, TReturn = void> = Fn<TArgs, Promise<TReturn>>;
+export type Resolved<T> = T extends Promise<infer U> ? U : T;

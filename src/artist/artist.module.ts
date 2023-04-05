@@ -9,5 +9,6 @@ import { ArtistResolver } from "@artist/artist.resolver";
 @Module({
     imports: [MetadataModule, ConfigModule],
     providers: [ArtistResolver, ArtistService],
+    exports: [ArtistService],
 })
 export class ArtistModule {}

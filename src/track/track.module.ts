@@ -9,5 +9,6 @@ import { TrackResolver } from "@track/track.resolver";
 @Module({
     imports: [MetadataModule, ConfigModule],
     providers: [TrackResolver, TrackService],
+    exports: [TrackService],
 })
 export class TrackModule {}

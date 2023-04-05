@@ -9,5 +9,6 @@ import { AlbumResolver } from "@album/album.resolver";
 @Module({
     imports: [MetadataModule, ConfigModule],
     providers: [AlbumResolver, AlbumService],
+    exports: [AlbumService],
 })
 export class AlbumModule {}

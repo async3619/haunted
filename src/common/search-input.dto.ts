@@ -7,6 +7,12 @@ export class SearchInput {
     @Field(() => String)
     public query!: string;
 
+    /**
+     * Limit the number of results
+     *
+     * @minimum 1
+     * @maximum 20
+     */
     @Field(() => Int, { nullable: true })
     @Min(1)
     @Max(20)

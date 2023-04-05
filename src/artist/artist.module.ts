@@ -7,7 +7,7 @@ import { ArtistService } from "@artist/artist.service";
 import { ArtistResolver } from "@artist/artist.resolver";
 
 @Module({
-    imports: [MetadataModule, ConfigModule],
+    imports: [MetadataModule, ConfigModule.forFeature()],
     providers: [ArtistResolver, ArtistService],
     exports: [ArtistService],
 })

@@ -1,22 +1,19 @@
 import { Test, TestingModule } from "@nestjs/testing";
 
-import { ConfigModule } from "@config/config.module";
-
 import { MetadataService } from "@metadata/metadata.service";
 
-import { installConfigMock } from "@test/utils/installConfigMock";
+import { installMockedConfig } from "@test/utils/installMockedConfig";
 
 describe("MetadataService", () => {
     let service: MetadataService;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            imports: [ConfigModule],
+            imports: [installMockedConfig()],
             providers: [MetadataService],
         }).compile();
 
         service = module.get<MetadataService>(MetadataService);
-        installConfigMock(service["configService"]);
     });
 
     afterEach(() => {

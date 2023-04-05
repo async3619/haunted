@@ -4,15 +4,17 @@ import { Album } from "@common/album.dto";
 
 import { MetadataService } from "@metadata/metadata.service";
 
+import { ConfigData } from "@config/config.module";
+import { InjectConfig } from "@config/config.decorator";
+
 import { ObjectService } from "@common/object.service";
-import { ConfigService } from "@config/config.service";
 
 @Injectable()
 export class AlbumService extends ObjectService<Album> {
     public constructor(
         @Inject(MetadataService) private readonly metadataService: MetadataService,
-        @Inject(ConfigService) private readonly configService: ConfigService,
+        @InjectConfig() private readonly configData: ConfigData,
     ) {
-        super(metadataService, configService, ({ resolver, ...input }) => resolver.searchAlbum(input));
+        super(metadataService, configData, ({ resolver, ...input }) => resolver.searchAlbum(input));
     }
 }

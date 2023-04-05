@@ -6,12 +6,14 @@ import { ArtistModule } from "@artist/artist.module";
 
 import { TRPCServerService } from "@trpc-server/trpc-server.service";
 
+import { installMockedConfig } from "@test/utils/installMockedConfig";
+
 describe("TRPCService", () => {
     let service: TRPCServerService;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            imports: [TrackModule, AlbumModule, ArtistModule],
+            imports: [installMockedConfig(), TrackModule, AlbumModule, ArtistModule],
             providers: [TRPCServerService],
         }).compile();
 

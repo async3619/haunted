@@ -1,11 +1,11 @@
 import { ObjectService } from "@common/object.service";
-import { ConfigService } from "@config/config.service";
+import { ConfigData, DEFAULT_CONFIG } from "@config/config.module";
 
 import { MetadataServiceMock } from "@test/utils/metadata.service.mock";
 
 class MockService extends ObjectService<any> {
-    public constructor() {
-        super(new MetadataServiceMock(), new ConfigService(), async () => [{ test: "value" }]);
+    public constructor(config: ConfigData = DEFAULT_CONFIG) {
+        super(new MetadataServiceMock(), config, async () => [{ test: "value" }]);
     }
 }
 
@@ -22,11 +22,7 @@ describe("ObjectService", () => {
     });
 
     it("should set cache TTL on module initialization", async () => {
-        const service = new MockService();
-        Object.defineProperty(service["config"], "getConfig", {
-            value: () => ({ cacheTTL: 1000 }),
-        });
-
+        const service = new MockService({ cacheTTL: 1000, resolvers: {} });
         await service.onModuleInit();
 
         expect(service["searchCache"]["timeToLive"]).toBe(1000);
@@ -34,10 +30,6 @@ describe("ObjectService", () => {
 
     it("should not set cache TTL on module initialization if it is not defined", async () => {
         const service = new MockService();
-        Object.defineProperty(service["config"], "getConfig", {
-            value: () => ({}),
-        });
-
         await service.onModuleInit();
 
         expect(service["searchCache"]["timeToLive"]).toBe(3600);

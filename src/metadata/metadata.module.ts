@@ -5,7 +5,7 @@ import { ConfigModule } from "@config/config.module";
 import { MetadataService } from "@metadata/metadata.service";
 
 @Module({
-    imports: [ConfigModule],
+    imports: [ConfigModule.forFeature()],
     providers: [MetadataService],
     exports: [MetadataService],
 })

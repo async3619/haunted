@@ -11,7 +11,6 @@ import { AppModule } from "@root/app.module";
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
     const trpcService = app.get(TRPCServerService);
-
     app.useGlobalPipes(new ValidationPipe());
     trpcService.applyMiddleware(app);
 

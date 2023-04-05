@@ -1,11 +1,11 @@
 import { Test, TestingModule } from "@nestjs/testing";
 
 import { MetadataModule } from "@metadata/metadata.module";
-import { ConfigModule } from "@config/config.module";
 
 import { TrackService } from "@track/track.service";
 
 import { installMetadataMock, MockResolver } from "@test/utils/installMetadataMock";
+import { installMockedConfig } from "@test/utils/installMockedConfig";
 
 describe("TrackService", () => {
     let service: TrackService;
@@ -13,7 +13,7 @@ describe("TrackService", () => {
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            imports: [MetadataModule, ConfigModule],
+            imports: [MetadataModule, installMockedConfig()],
             providers: [TrackService],
         }).compile();
 

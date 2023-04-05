@@ -7,7 +7,7 @@ import { AlbumService } from "@album/album.service";
 import { AlbumResolver } from "@album/album.resolver";
 
 @Module({
-    imports: [MetadataModule, ConfigModule],
+    imports: [MetadataModule, ConfigModule.forFeature()],
     providers: [AlbumResolver, AlbumService],
     exports: [AlbumService],
 })

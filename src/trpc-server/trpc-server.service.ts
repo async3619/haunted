@@ -9,6 +9,9 @@ import { TrackService } from "@track/track.service";
 import { AlbumService } from "@album/album.service";
 import { ArtistService } from "@artist/artist.service";
 
+import { ConfigData } from "@config/config.module";
+import { InjectConfig } from "@config/config.decorator";
+
 import { SearchInput } from "@common/search-input.dto";
 
 import { RouteArgs } from "@trpc-server/types";
@@ -23,14 +26,18 @@ export class TRPCServerService {
     });
 
     public constructor(
+        @InjectConfig() private readonly configData: ConfigData,
         @Inject(TrackService) private readonly trackService: TrackService,
         @Inject(AlbumService) private readonly albumService: AlbumService,
         @Inject(ArtistService) private readonly artistService: ArtistService,
     ) {}
 
     public applyMiddleware(app: NestExpressApplication) {
+        const { servers = {} } = this.configData;
+        const { trpc = {} } = servers;
+
         app.use(
-            "/trpc",
+            trpc.path || "/trpc",
             createExpressMiddleware({
                 router: this.appRouter,
             }),

@@ -1,29 +1,34 @@
 import * as fs from "fs-extra";
-import { Test, TestingModule } from "@nestjs/testing";
-
-import { ConfigData, ConfigService, DEFAULT_CONFIG } from "@config/config.service";
+import { Test } from "@nestjs/testing";
+import { ConfigData, ConfigModule, DEFAULT_CONFIG } from "@config/config.module";
+import { InjectConfig } from "@config/config.decorator";
 
 jest.mock("fs-extra");
 
 const mockedFs = fs as jest.Mocked<typeof fs>;
 
-describe("ConfigService", () => {
-    let service: ConfigService;
+async function createMockedModule() {
+    class MockService {
+        public constructor(@InjectConfig() public readonly config: ConfigData) {}
+    }
 
-    beforeEach(async () => {
-        const module: TestingModule = await Test.createTestingModule({
-            providers: [ConfigService],
-        }).compile();
+    const module = await Test.createTestingModule({
+        imports: [ConfigModule.forFeature()],
+        providers: [MockService],
+    }).compile();
 
-        service = module.get<ConfigService>(ConfigService);
-    });
+    const mockService = module.get(MockService);
 
+    return { module, mockService };
+}
+
+describe("ConfigModule", () => {
     afterEach(() => {
         jest.resetAllMocks();
     });
 
     it("should be defined", () => {
-        expect(service).toBeDefined();
+        expect(module).toBeDefined();
     });
 
     it("should be able to read config file from disk", async () => {
@@ -39,10 +44,10 @@ describe("ConfigService", () => {
         mockedFs.existsSync.mockReturnValue(true);
         mockedFs.readJson.mockResolvedValue(mockedConfig);
 
-        await service.onModuleInit();
+        const { mockService } = await createMockedModule();
 
         expect(mockedFs.readJson).toBeCalledTimes(1);
-        expect(service.getConfig()).toEqual(mockedConfig);
+        expect(mockService.config).toEqual(mockedConfig);
     });
 
     it("should write default config to disk if config file does not exist", async () => {
@@ -50,20 +55,20 @@ describe("ConfigService", () => {
         mockedFs.writeJson.mockResolvedValue();
         mockedFs.readJson.mockResolvedValue(DEFAULT_CONFIG);
 
-        await service.onModuleInit();
+        const { mockService } = await createMockedModule();
 
         expect(mockedFs.writeJson).toBeCalledTimes(1);
         expect(mockedFs.writeJson).toBeCalledWith(expect.stringContaining("config.json"), DEFAULT_CONFIG, {
             spaces: 4,
         });
-        expect(service.getConfig()).toEqual(DEFAULT_CONFIG);
+        expect(mockService.config).toEqual(DEFAULT_CONFIG);
     });
 
     it("should throw error if config file exists but is invalid", async () => {
         mockedFs.existsSync.mockReturnValue(true);
         mockedFs.readJson.mockResolvedValue({});
 
-        await expect(service.onModuleInit()).rejects.toThrowError("config file is invalid.");
+        await expect(createMockedModule()).rejects.toThrowError("config file is invalid.");
     });
 
     it("should write schema definition to disk in development mode", async () => {
@@ -75,7 +80,7 @@ describe("ConfigService", () => {
             return;
         });
 
-        await service.onModuleInit();
+        await createMockedModule();
 
         expect(mockedFs.writeJson).toBeCalledTimes(1);
         expect(mockedFs.writeJson).toBeCalledWith(expect.stringContaining("config.schema.json"), expect.anything(), {
@@ -83,9 +88,5 @@ describe("ConfigService", () => {
         });
 
         process.env.NODE_ENV = "test";
-    });
-
-    it("should throw error when getConfig is called before onModuleInit", () => {
-        expect(() => service.getConfig()).toThrowError("Config service is not initialized yet");
     });
 });

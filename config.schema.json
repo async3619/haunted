@@ -35,6 +35,40 @@
             },
             "nullable": false,
             "x-typia-jsDocTags": []
+        },
+        "servers": {
+            "x-typia-required": false,
+            "type": "object",
+            "properties": {
+                "graphql": {
+                    "x-typia-required": false,
+                    "type": "object",
+                    "properties": {
+                        "path": {
+                            "type": "string",
+                            "nullable": false,
+                            "x-typia-required": false
+                        }
+                    },
+                    "nullable": false,
+                    "x-typia-jsDocTags": []
+                },
+                "trpc": {
+                    "x-typia-required": false,
+                    "type": "object",
+                    "properties": {
+                        "path": {
+                            "type": "string",
+                            "nullable": false,
+                            "x-typia-required": false
+                        }
+                    },
+                    "nullable": false,
+                    "x-typia-jsDocTags": []
+                }
+            },
+            "nullable": false,
+            "x-typia-jsDocTags": []
         }
     },
     "nullable": false,

@@ -7,7 +7,7 @@ import { TrackService } from "@track/track.service";
 import { TrackResolver } from "@track/track.resolver";
 
 @Module({
-    imports: [MetadataModule, ConfigModule],
+    imports: [MetadataModule, ConfigModule.forFeature()],
     providers: [TrackResolver, TrackService],
     exports: [TrackService],
 })

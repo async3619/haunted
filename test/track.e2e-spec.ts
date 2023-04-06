@@ -7,7 +7,7 @@ import { TRPCServerService } from "@trpc-server/trpc-server.service";
 
 import { AppModule } from "@root/app.module";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
-import { Router } from "@root/index";
+import { Router } from "@root/router";
 
 describe("Track (e2e)", () => {
     let app: NestExpressApplication;

@@ -6,7 +6,7 @@ import { NestExpressApplication } from "@nestjs/platform-express";
 import { AppModule } from "@root/app.module";
 import { TRPCServerService } from "@trpc-server/trpc-server.service";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
-import { Router } from "@root/index";
+import { Router } from "@root/router";
 
 describe("Album (e2e)", () => {
     let app: NestExpressApplication;

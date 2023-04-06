@@ -20,9 +20,15 @@ import { RouteArgs } from "@trpc-server/types";
 export class TRPCServerService {
     private readonly t = initTRPC.create();
     private readonly appRouter = this.t.router({
-        searchAlbums: this.t.procedure.input(createAssert<SearchInput>()).query(this.searchAlbums.bind(this)),
-        searchTracks: this.t.procedure.input(createAssert<SearchInput>()).query(this.searchTracks.bind(this)),
-        searchArtists: this.t.procedure.input(createAssert<SearchInput>()).query(this.searchArtists.bind(this)),
+        searchAlbums: this.t.procedure.input(createAssert<SearchInput>()).query(({ input }) => {
+            return this.albumService.search(input);
+        }),
+        searchTracks: this.t.procedure.input(createAssert<SearchInput>()).query(({ input }) => {
+            return this.trackService.search(input);
+        }),
+        searchArtists: this.t.procedure.input(createAssert<SearchInput>()).query(({ input }) => {
+            return this.artistService.search(input);
+        }),
     });
 
     public constructor(

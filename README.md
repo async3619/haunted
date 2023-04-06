@@ -19,6 +19,9 @@
     <a href="https://hub.docker.com/r/async3619/haunted">
         <img alt="Docker Image Version (tag latest semver)" src="https://img.shields.io/docker/v/async3619/haunted/latest?label=docker&style=flat-square">
     </a>
+    <a href="https://www.npmjs.com/package/@async3619/haunted">
+        <img alt="npm" src="https://img.shields.io/npm/v/@async3619/haunted?style=flat-square" />
+    </a>
     <br />
     <sup>music metadata retrieving server</sup>
     <br />

@@ -47,6 +47,9 @@ export async function preparePackage() {
             acc[dep] = "*";
             return acc;
         }, {}),
+        publishConfig: {
+            access: "public",
+        },
     };
 
     await fs.ensureDir(PACKAGE_DIR);

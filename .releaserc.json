@@ -40,15 +40,16 @@
             }
         ],
         [
-            "@semantic-release/npm",
+            "@semantic-release/exec",
             {
-                "pkgRoot": "./package"
+                "verifyConditionsCmd": "sh ./tools/package.sh ${nextRelease.version}",
+                "prepareCmd": "sh ./tools/package.sh ${nextRelease.version}"
             }
         ],
         [
-            "@semantic-release/exec",
+            "@semantic-release/npm",
             {
-                "prepareCmd": "sh ./tools/package.sh ${nextRelease.version}"
+                "pkgRoot": "./package"
             }
         ],
         "@semantic-release/github",

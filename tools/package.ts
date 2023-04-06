@@ -9,13 +9,7 @@ const DIST_DIR = path.join(process.cwd(), "dist");
 const PACKAGE_DIR = path.join(process.cwd(), "package");
 const filesToCopy = ["README.md", "LICENSE"].map(file => path.join(process.cwd(), file));
 
-export async function preparePackage(version?: string) {
-    if (!version) {
-        throw new Error("No version provided");
-    }
-
-    version = version.replace(/^v/, "");
-
+export async function preparePackage() {
     if (!fs.existsSync(DIST_DIR)) {
         throw new Error("`./dist` directory does not exist. Did you run 'yarn build' first?");
     }
@@ -46,7 +40,7 @@ export async function preparePackage(version?: string) {
     const { scripts, dependencies, devDependencies, ...rest } = pkg;
     const newPkg = {
         ...rest,
-        version,
+        version: "0.0.0",
         main: "",
         types: "index.d.ts",
         dependencies: [...newDependencies].reduce((acc, dep) => {
@@ -64,4 +58,4 @@ export async function preparePackage(version?: string) {
     }
 }
 
-preparePackage(process.argv.at(-1)).then();
+preparePackage().then();

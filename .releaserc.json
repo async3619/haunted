@@ -42,8 +42,14 @@
         [
             "@semantic-release/exec",
             {
-                "verifyConditionsCmd": "sh ./tools/package.sh ${nextRelease.version}",
-                "prepareCmd": "sh ./tools/package.sh ${nextRelease.version}"
+                "verifyConditionsCmd": "sh ./tools/package.sh"
+            }
+        ],
+        [
+            "@semantic-release/npm",
+            {
+                "pkgRoot": ".",
+                "npmPublish": false
             }
         ],
         [

@@ -1,10 +1,13 @@
 {
     "name": "@async3619/haunted",
     "version": "1.1.0",
-    "description": "",
-    "author": "",
-    "private": true,
-    "license": "UNLICENSED",
+    "description": "music metadata retrieving server",
+    "author": {
+        "url": "sophia-dev.io",
+        "name": "Sophia",
+        "email": "me@sophia-dev.io"
+    },
+    "license": "MIT",
     "types": "./dist/index.d.ts",
     "scripts": {
         "build": "ttsc -p tsconfig.build.json",

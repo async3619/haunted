@@ -1427,6 +1427,18 @@
   resolved "https://registry.yarnpkg.com/@semantic-release/error/-/error-3.0.0.tgz#30a3b97bbb5844d695eb22f9d3aa40f6a92770c2"
   integrity sha512-5hiM4Un+tpl4cKw3lV4UgzJj+SmfNIDCLLw0TepzQxz9ZGV5ixnqkzIVF+3tp0ZHgcMKE+VNGHJjEeyFG2dcSw==
 
+"@semantic-release/exec@^6.0.3":
+  version "6.0.3"
+  resolved "https://registry.yarnpkg.com/@semantic-release/exec/-/exec-6.0.3.tgz#d212fdf19633bdfb553de6cb6c7f8781933224db"
+  integrity sha512-bxAq8vLOw76aV89vxxICecEa8jfaWwYITw6X74zzlO0mc/Bgieqx9kBRz9z96pHectiTAtsCwsQcUyLYWnp3VQ==
+  dependencies:
+    "@semantic-release/error" "^3.0.0"
+    aggregate-error "^3.0.0"
+    debug "^4.0.0"
+    execa "^5.0.0"
+    lodash "^4.17.4"
+    parse-json "^5.0.0"
+
 "@semantic-release/git@^10.0.1":
   version "10.0.1"
   resolved "https://registry.yarnpkg.com/@semantic-release/git/-/git-10.0.1.tgz#c646e55d67fae623875bf3a06a634dd434904498"
@@ -3301,6 +3313,14 @@ drange@^1.0.2:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/drange/-/drange-1.1.1.tgz#b2aecec2aab82fcef11dbbd7b9e32b83f8f6c0b8"
   integrity sha512-pYxfDYpued//QpnLIm4Avk7rsNtAtQkUES2cwAYSvD/wd2pKD71gN2Ebj3e7klzXwjocvE8c5vx/1fxwpqmSxA==
+
+dts-bundle-generator@^8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/dts-bundle-generator/-/dts-bundle-generator-8.0.0.tgz#5ae718ecf9ef5a94fa9d3d507791cf62af6a8a8a"
+  integrity sha512-9Du4uQLRs/doabHzVDFIKsbUA9KHdPkfd0YRgsJ7rXtVSKCfuW0EsM/d2AoXw2fNgxcSfJ01/8szOy4u6ze/2g==
+  dependencies:
+    typescript ">=5.0.2"
+    yargs "^17.6.0"
 
 duplexer2@~0.1.0:
   version "0.1.4"
@@ -8305,6 +8325,11 @@ typescript@4.9.5, typescript@^4.9.5:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.9.5.tgz#095979f9bcc0d09da324d58d03ce8f8374cbe65a"
   integrity sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==
 
+typescript@>=5.0.2:
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.0.3.tgz#fe976f0c826a88d0a382007681cbb2da44afdedf"
+  integrity sha512-xv8mOEDnigb/tN9PSMTwSEqAnUvkoXMQlicOb0IUVDBSQCgBSaAAROUZYy2IcUy5qU6XajK5jjjO7TMWqBTKZA==
+
 typia@^3.7.0:
   version "3.7.0"
   resolved "https://registry.yarnpkg.com/typia/-/typia-3.7.0.tgz#294c7284e97b159432bca71d3c59afc86d001ddb"
@@ -8751,7 +8776,7 @@ yargs@^15.0.2, yargs@^15.4.1:
     y18n "^4.0.0"
     yargs-parser "^18.1.2"
 
-yargs@^17.3.1, yargs@^17.5.1:
+yargs@^17.3.1, yargs@^17.5.1, yargs@^17.6.0:
   version "17.7.1"
   resolved "https://registry.yarnpkg.com/yargs/-/yargs-17.7.1.tgz#34a77645201d1a8fc5213ace787c220eabbd0967"
   integrity sha512-cwiTb08Xuv5fqF4AovYacTFNxk62th7LKJ6BL9IGUpTJrWoU7/7WdQGTP2SjKf1dUNBGzDd28p/Yfs/GI6JrLw==

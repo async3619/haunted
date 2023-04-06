@@ -21,7 +21,8 @@
         "test": "jest",
         "test:e2e": "jest --config ./test/jest.config.e2e.ts",
         "coverage": "istanbul-merge --out ./coverage-merged/coverage-final.json ./coverage/coverage-final.json ./coverage-e2e/coverage-final.json",
-        "postcoverage": "nyc report -t coverage-merged --report-dir coverage-merged --reporter=html --reporter=cobertura"
+        "postcoverage": "nyc report -t coverage-merged --report-dir coverage-merged --reporter=html --reporter=cobertura",
+        "package": "ts-node ./tools/package.ts"
     },
     "dependencies": {
         "@apidevtools/json-schema-ref-parser": "^10.1.0",
@@ -53,6 +54,7 @@
         "@nestjs/schematics": "^9.0.0",
         "@nestjs/testing": "^9.0.0",
         "@semantic-release/commit-analyzer": "^9.0.2",
+        "@semantic-release/exec": "^6.0.3",
         "@semantic-release/git": "^10.0.1",
         "@semantic-release/github": "^8.0.7",
         "@semantic-release/npm": "^10.0.2",
@@ -69,6 +71,7 @@
         "@typescript-eslint/parser": "^5.0.0",
         "conventional-changelog-conventionalcommits": "^5.0.0",
         "dotenv": "^16.0.3",
+        "dts-bundle-generator": "^8.0.0",
         "eslint": "^8.0.1",
         "eslint-config-prettier": "^8.3.0",
         "eslint-plugin-prettier": "^4.0.0",

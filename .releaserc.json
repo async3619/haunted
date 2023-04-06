@@ -39,7 +39,18 @@
                 }
             }
         ],
-        "@semantic-release/npm",
+        [
+            "@semantic-release/npm",
+            {
+                "pkgRoot": "./package"
+            }
+        ],
+        [
+            "@semantic-release/exec",
+            {
+                "prepareCmd": "sh ./tools/package.sh ${nextRelease.version}"
+            }
+        ],
         "@semantic-release/github",
         [
             "@semantic-release/git",

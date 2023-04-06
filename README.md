@@ -20,7 +20,7 @@
         <img alt="Docker Image Version (tag latest semver)" src="https://img.shields.io/docker/v/async3619/haunted/latest?label=docker&style=flat-square">
     </a>
     <br />
-    <sup>Music metadata retrieving server for <a href="https://github.com/async3619/cruise">Cruise</a></sup>
+    <sup>music metadata retrieving server</sup>
     <br />
     <br />
 </div>
@@ -53,23 +53,103 @@ services:
             - ./config.json:/home/node/config.json:ro
 ```
 
+## 📝 Usage
+
+Before using this server in client side, you need to launch this server. see [Getting Started](#-getting-started) section.
+
+### 📡 TRPC
+
+you can use this server with [TRPC](https://trpc.io/). we provide a type-safe client for TRPC. we also provide 
+server-side router types for client usage. all you need to do is to import `Router` type from `@async3619/haunted`.
+
+now, you should install `@async3619/haunted` package in your client project to get type definitions.
+
+```bash
+npm install @async3619/haunted 
+
+# or
+
+yarn add @async3619/haunted
+
+# or
+
+pnpm add @async3619/haunted
+```
+
+now you can use this server with TRPC:
+
+```ts
+import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
+import { Router } from "@async3619/haunted";
+//       ^^^^^^ this will make you comfy and type-safe with your IDE
+
+// ...
+
+const client = createTRPCProxyClient<Router>({
+    links: [httpBatchLink({ url: "http://localhost:3000/trpc" })],
+});
+
+const result = await client.searchAlbums({ query: "독립음악", limit: 5, locale: "ko_KR" });
+console.log(result); // [{ ... }]
+```
+
+### 📡 GraphQL
+
+In addition to TRPC, you can use this server with GraphQL. we provide [schema definitions](./schema.graphqls) for 
+GraphQL. you can use `./schema.graphql` file to generate your client-side code with your favorite GraphQL client 
+generator such as `apollo-codegen` or `graphql-codegen`.
+
+```ts
+import { ApolloClient, InMemoryCache, gql } from "@apollo/client"; // or your favorite GraphQL client
+
+const client = new ApolloClient({
+    uri: "http://localhost:3000/graphql",
+    cache: new InMemoryCache(),
+});
+
+const result = await client.query({
+    query: gql`
+        query SearchAlbums($input: SearchInput!) {
+            searchAlbums(input: $input) {
+                title
+                artists
+            }
+        }
+    `,
+    variables: {
+        query: "독립음악",
+    },
+});
+
+console.log(result.data); // { searchAlbums: [{ ... }] }
+```
+
 ## 🛠️ Configuration
 
-This server uses `config.json` file from current working directory. we provide the configuration schema in 
+This server uses `config.json` file from current working directory. we provide the configuration schema in
 `config.schema.json` file. you can use this file to validate your configuration file in your IDE.
 
 ```json5
 {
-    "cacheTTL": 3600, // cache TTL in seconds
-    "resolvers": {
-        // whatever resolvers you want to use
-        "spotify": {
-            "clientId": "<your spotify client id>",
-            "clientSecret": "<your spotify client secret>"
+    servers: {
+        trpc: {
+            path: "/trpc",
         },
-    }
+        graphql: {
+            path: "/graphql",
+        },
+    },
+    cacheTTL: 3600, // cache TTL in seconds
+    resolvers: {
+        // whatever resolvers you want to use
+        spotify: {
+            clientId: "<your spotify client id>",
+            clientSecret: "<your spotify client secret>",
+        },
+    },
 }
 ```
+
 ## 🎵 Resolvers
 
 Currently, this server supports Spotify resolver only. but we are planning to add more resolvers in the future.
@@ -77,8 +157,8 @@ Currently, this server supports Spotify resolver only. but we are planning to ad
 ### Supported Resolvers
 
 | Service       | Support? |
-|---------------|:--------:|
-| Spotify       |    ✅     |
-| YouTube Music |    ❌     |
-| Apple Music   |    ❌     |
-| Deezer        |    ❌     |
+| ------------- | :------: |
+| Spotify       |    ✅    |
+| YouTube Music |    ❌    |
+| Apple Music   |    ❌    |
+| Deezer        |    ❌    |

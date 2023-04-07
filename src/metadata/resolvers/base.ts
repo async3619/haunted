@@ -7,6 +7,7 @@ import { isRawAlbumArray, RawAlbum } from "@common/album.dto";
 import { MediaObjectMap, MediaType } from "@common/types";
 
 import { Loggable } from "@utils/loggable";
+import { Nullable } from "@utils/types";
 
 export default abstract class BaseResolver<
     TType extends string,
@@ -96,16 +97,16 @@ export default abstract class BaseResolver<
         id: string,
         type: Type,
         locale?: string,
-    ): Promise<MediaObjectMap[Type] | null> {
+    ): Promise<Nullable<MediaObjectMap[Type]>> {
         const items = await this.getItems([id], type, locale);
 
-        return items.length > 0 ? items[0] : null;
+        return items[0];
     }
     public async getItems<Type extends MediaType>(
         ids: string[],
         type: Type,
         locale?: string,
-    ): Promise<MediaObjectMap[Type][]> {
+    ): Promise<Nullable<MediaObjectMap[Type]>[]> {
         const rawData = await (async () => {
             switch (type) {
                 case "track":
@@ -122,16 +123,20 @@ export default abstract class BaseResolver<
             }
         })();
 
-        return rawData.map(item => ({
-            ...item,
-            id: this.getId(item.id),
-            serviceName: this.getServiceName(),
-        }));
+        return rawData.map(item =>
+            item
+                ? {
+                      ...item,
+                      id: this.getId(item.id),
+                      serviceName: this.getServiceName(),
+                  }
+                : null,
+        );
     }
 
-    protected abstract getTracks(ids: string[], locale?: string): Promise<RawTrack[]>;
-    protected abstract getAlbums(ids: string[], locale?: string): Promise<RawAlbum[]>;
-    protected abstract getArtists(ids: string[], locale?: string): Promise<RawArtist[]>;
+    protected abstract getTracks(ids: string[], locale?: string): Promise<Nullable<RawTrack>[]>;
+    protected abstract getAlbums(ids: string[], locale?: string): Promise<Nullable<RawAlbum>[]>;
+    protected abstract getArtists(ids: string[], locale?: string): Promise<Nullable<RawArtist>[]>;
 
     protected abstract searchTrack(input: SearchInput): Promise<RawTrack[]>;
     protected abstract searchAlbum(input: SearchInput): Promise<RawAlbum[]>;

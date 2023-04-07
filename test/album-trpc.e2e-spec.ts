@@ -2,7 +2,7 @@ import { NestExpressApplication } from "@nestjs/platform-express";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 
 import { initializeE2E } from "@test/utils/initializeE2E";
-import { expectContainPartially } from "@test/utils/expect";
+import { expectContainPartially, expectContainPartiallyInArray } from "@test/utils/expect";
 
 import { Router } from "@root/router";
 
@@ -28,9 +28,54 @@ describe("Album (e2e)", () => {
         await app.close();
     });
 
+    describe("album (TRPC)", () => {
+        it("should be able to get album", async () => {
+            expectContainPartially(
+                await client.album.query({
+                    id: "spotify::5KyAvL3uY3CsyNXPjKmDyU",
+                }),
+                {
+                    title: "Independent Music",
+                    artists: [expect.objectContaining({ name: "CHOILB" })],
+                },
+            );
+        });
+
+        it("should be able to return null if album is not found", async () => {
+            expect(
+                await client.album.query({
+                    id: "spotify::test",
+                }),
+            ).toBeNull();
+        });
+
+        it("should respect locale", async () => {
+            expectContainPartially(
+                await client.album.query({
+                    id: "spotify::5KyAvL3uY3CsyNXPjKmDyU",
+                }),
+                {
+                    title: "Independent Music",
+                    artists: [expect.objectContaining({ name: "CHOILB" })],
+                },
+            );
+
+            expectContainPartially(
+                await client.album.query({
+                    id: "spotify::5KyAvL3uY3CsyNXPjKmDyU",
+                    locale: "ko_KR",
+                }),
+                {
+                    title: "독립음악",
+                    artists: [expect.objectContaining({ name: "최엘비" })],
+                },
+            );
+        });
+    });
+
     describe("albums (TRPC)", () => {
         it("should be able to get albums", async () => {
-            expectContainPartially(
+            expectContainPartiallyInArray(
                 await client.albums.query({
                     ids: ["spotify::5KyAvL3uY3CsyNXPjKmDyU"],
                 }),
@@ -41,8 +86,16 @@ describe("Album (e2e)", () => {
             );
         });
 
+        it("should be able to return null if album is not found", async () => {
+            expect(
+                await client.albums.query({
+                    ids: ["spotify::test"],
+                }),
+            ).toEqual([null]);
+        });
+
         it("should respect locale", async () => {
-            expectContainPartially(
+            expectContainPartiallyInArray(
                 await client.albums.query({
                     ids: ["spotify::5KyAvL3uY3CsyNXPjKmDyU"],
                 }),
@@ -52,7 +105,7 @@ describe("Album (e2e)", () => {
                 },
             );
 
-            expectContainPartially(
+            expectContainPartiallyInArray(
                 await client.albums.query({
                     ids: ["spotify::5KyAvL3uY3CsyNXPjKmDyU"],
                     locale: "ko_KR",
@@ -67,7 +120,7 @@ describe("Album (e2e)", () => {
 
     describe("searchAlbums (TRPC)", () => {
         it("should be able to search albums", async () => {
-            expectContainPartially(
+            expectContainPartiallyInArray(
                 await client.searchAlbums.query({
                     query: "독립음악",
                     limit: 1,
@@ -89,7 +142,7 @@ describe("Album (e2e)", () => {
         });
 
         it("should respect locale", async () => {
-            expectContainPartially(
+            expectContainPartiallyInArray(
                 await client.searchAlbums.query({
                     query: "독립음악",
                     limit: 1,
@@ -100,7 +153,7 @@ describe("Album (e2e)", () => {
                 },
             );
 
-            expectContainPartially(
+            expectContainPartiallyInArray(
                 await client.searchAlbums.query({
                     query: "독립음악",
                     locale: "ko_KR",

@@ -41,6 +41,14 @@ describe("Track (e2e)", () => {
             );
         });
 
+        it("should be able to return null if track is not found", async () => {
+            expect(
+                await client.track.query({
+                    id: "spotify::test",
+                }),
+            ).toBeNull();
+        });
+
         it("should respect locale", async () => {
             expectContainPartially(
                 await client.track.query({
@@ -76,6 +84,14 @@ describe("Track (e2e)", () => {
                     artists: [expect.objectContaining({ name: "CHOILB" })],
                 },
             );
+        });
+
+        it("should be able to return null if track is not found", async () => {
+            expect(
+                await client.tracks.query({
+                    ids: ["spotify::test"],
+                }),
+            ).toEqual([null]);
         });
 
         it("should respect locale", async () => {

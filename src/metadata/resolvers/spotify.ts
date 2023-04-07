@@ -2,11 +2,9 @@ import { is } from "typia";
 import SpotifyWebApi from "spotify-web-api-node";
 
 import { SearchInput } from "@common/search-input.dto";
-import { RawTrack } from "@common/track.dto";
-import { RawAlbum } from "@common/album.dto";
-import { RawArtist } from "@common/artist.dto";
 
 import BaseResolver from "@metadata/resolvers/base";
+
 import { JsonResponse, Request } from "@utils/request";
 
 export interface SpotifyResolverOptions {
@@ -90,23 +88,23 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
         };
     }
 
-    protected async getTracks(ids: string[], locale?: string): Promise<RawTrack[]> {
+    protected async getTracks(ids: string[], locale?: string) {
         const { body } = await this.request("/v1/tracks", { ids, locale });
 
-        return body.tracks.map(this.composeTrack);
+        return body.tracks.map(item => (item ? this.composeTrack(item) : null));
     }
-    protected async getAlbums(ids: string[], locale?: string): Promise<RawAlbum[]> {
+    protected async getAlbums(ids: string[], locale?: string) {
         const { body } = await this.request("/v1/albums", { ids, locale });
 
-        return body.albums.map(this.composeAlbum);
+        return body.albums.map(item => (item ? this.composeAlbum(item) : null));
     }
-    protected async getArtists(ids: string[], locale?: string): Promise<RawArtist[]> {
+    protected async getArtists(ids: string[], locale?: string) {
         const { body } = await this.request("/v1/artists", { ids, locale });
 
-        return body.artists.map(this.composeArtist);
+        return body.artists.map(item => (item ? this.composeArtist(item) : null));
     }
 
-    protected async searchTrack({ query, limit = 20, locale }: SearchInput): Promise<RawTrack[]> {
+    protected async searchTrack({ query, limit = 20, locale }: SearchInput) {
         const { body } = await this.request("/v1/search", { q: query, type: ["track"], limit, locale });
         if (!body.tracks) {
             throw new Error("Invalid response");
@@ -114,7 +112,7 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
 
         return body.tracks.items.map(this.composeTrack);
     }
-    protected async searchAlbum({ query, limit = 20, locale }: SearchInput): Promise<RawAlbum[]> {
+    protected async searchAlbum({ query, limit = 20, locale }: SearchInput) {
         const { body } = await this.request("/v1/search", { q: query, type: ["album"], limit, locale });
         if (!body.albums) {
             throw new Error("Invalid response");
@@ -129,7 +127,7 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
 
         return albums.map(this.composeAlbum);
     }
-    protected async searchArtist({ query, limit = 20, locale }: SearchInput): Promise<RawArtist[]> {
+    protected async searchArtist({ query, limit = 20, locale }: SearchInput) {
         const { body } = await this.request("/v1/search", { q: query, type: ["artist"], limit, locale });
         if (!body.artists) {
             throw new Error("Invalid response");

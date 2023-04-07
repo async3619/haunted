@@ -64,13 +64,13 @@ type Album {
 
 type Query {
   track(input: GetItemInput!): Track
-  tracks(input: GetItemsInput!): [Track!]!
+  tracks(input: GetItemsInput!): [Track]!
   searchTracks(input: SearchInput!): [Track!]!
   album(input: GetItemInput!): Album
-  albums(input: GetItemsInput!): [Album!]!
+  albums(input: GetItemsInput!): [Album]!
   searchAlbums(input: SearchInput!): [Album!]!
   artist(input: GetItemInput!): Artist
-  artists(input: GetItemsInput!): [Artist!]!
+  artists(input: GetItemsInput!): [Artist]!
   searchArtists(input: SearchInput!): [Artist!]!
 }
 

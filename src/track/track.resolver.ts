@@ -7,6 +7,7 @@ import { SearchInput } from "@common/search-input.dto";
 import { GetItemsInput } from "@common/get-items-input.dto";
 import { GetItemInput } from "@common/get-item-input.dto";
 import { Track } from "@common/track.dto";
+import { Nullable } from "@utils/types";
 
 @Resolver()
 export class TrackResolver {
@@ -15,14 +16,14 @@ export class TrackResolver {
     @Query(() => Track, { nullable: true })
     public async track(
         @Args("input", { type: () => GetItemInput }) { locale, id }: GetItemInput,
-    ): Promise<Track | null> {
+    ): Promise<Nullable<Track>> {
         return this.trackService.getItem(id, locale);
     }
 
-    @Query(() => [Track])
+    @Query(() => [Track], { nullable: "items" })
     public async tracks(
         @Args("input", { type: () => GetItemsInput }) { locale, ids }: GetItemsInput,
-    ): Promise<Track[]> {
+    ): Promise<Nullable<Track>[]> {
         return this.trackService.getItems(ids, locale);
     }
 

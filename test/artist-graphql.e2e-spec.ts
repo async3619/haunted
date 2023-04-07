@@ -67,6 +67,12 @@ describe("Artist (e2e)", () => {
             });
         });
 
+        it("should be able to return null if artist is not found", async () => {
+            const { data } = await client.query(artistQuery, { input: { id: "spotify::test" } }).toPromise();
+
+            expect(data?.artist).toBeNull();
+        });
+
         it("should respect locale", async () => {
             const result_en = await client
                 .query(artistQuery, { input: { id: "spotify::02WoRfOhF5nUVpwddshInq" } })
@@ -90,6 +96,12 @@ describe("Artist (e2e)", () => {
             expectContainPartiallyInArray(data?.artists, {
                 name: "CHOILB",
             });
+        });
+
+        it("should be able to return null if artist is not found", async () => {
+            const { data } = await client.query(artistsQuery, { input: { ids: ["spotify::test"] } }).toPromise();
+
+            expect(data?.artists?.[0]).toBeNull();
         });
 
         it("should respect locale", async () => {

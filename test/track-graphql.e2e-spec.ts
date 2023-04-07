@@ -80,6 +80,12 @@ describe("Track (e2e)", () => {
             });
         });
 
+        it("should be able to return null if track is not found", async () => {
+            const { data } = await client.query(trackQuery, { input: { id: "spotify::test" } }).toPromise();
+
+            expect(data?.track).toBeNull();
+        });
+
         it("should respect locale", async () => {
             const result_en = await client
                 .query(trackQuery, { input: { id: "spotify::7Jin5db4i7evTFvtGU1Am1" } })
@@ -104,6 +110,12 @@ describe("Track (e2e)", () => {
                 id: "spotify::7Jin5db4i7evTFvtGU1Am1",
                 title: "Independent Music",
             });
+        });
+
+        it("should be able to return null if track is not found", async () => {
+            const { data } = await client.query(tracksQuery, { input: { ids: ["spotify::test"] } }).toPromise();
+
+            expect(data?.tracks).toEqual([null]);
         });
 
         it("should respect locale", async () => {

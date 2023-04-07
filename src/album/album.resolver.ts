@@ -8,6 +8,8 @@ import { GetItemsInput } from "@common/get-items-input.dto";
 import { Album } from "@common/album.dto";
 import { GetItemInput } from "@common/get-item-input.dto";
 
+import { Nullable } from "@utils/types";
+
 @Resolver()
 export class AlbumResolver {
     public constructor(@Inject(AlbumService) private readonly albumService: AlbumService) {}
@@ -15,14 +17,14 @@ export class AlbumResolver {
     @Query(() => Album, { nullable: true })
     public async album(
         @Args("input", { type: () => GetItemInput }) { locale, id }: GetItemInput,
-    ): Promise<Album | null> {
+    ): Promise<Nullable<Album>> {
         return this.albumService.getItem(id, locale);
     }
 
-    @Query(() => [Album])
+    @Query(() => [Album], { nullable: "items" })
     public async albums(
         @Args("input", { type: () => GetItemsInput }) { locale, ids }: GetItemsInput,
-    ): Promise<Album[]> {
+    ): Promise<Nullable<Album>[]> {
         return this.albumService.getItems(ids, locale);
     }
 

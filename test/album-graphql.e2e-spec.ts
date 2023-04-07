@@ -80,6 +80,12 @@ describe("Album (e2e)", () => {
             });
         });
 
+        it("should be able to return null if album is not found", async () => {
+            const { data } = await client.query(albumQuery, { input: { id: "spotify::test" } }).toPromise();
+
+            expect(data?.album).toBeNull();
+        });
+
         it("should respect locale", async () => {
             const { data: en } = await client
                 .query(albumQuery, { input: { id: "spotify::5KyAvL3uY3CsyNXPjKmDyU" } })
@@ -104,6 +110,12 @@ describe("Album (e2e)", () => {
                 id: "spotify::5DxGRsBdRlbyWoEWvrYQ5P",
                 title: "angel",
             });
+        });
+
+        it("should be able to return null if album is not found", async () => {
+            const { data } = await client.query(albumsQuery, { input: { ids: ["spotify::test"] } }).toPromise();
+
+            expect(data?.albums).toEqual([null]);
         });
 
         it("should respect locale", async () => {

@@ -35,7 +35,7 @@ describe("Cache", () => {
         expect(cache.getMany(["test", "test2"])).toEqual([1, 2]);
     });
 
-    it("should be able to get multiple values with nulls", () => {
+    it("should be able to get multiple values with undefined", () => {
         const cache = new CacheStorage<string, number>();
         cache.setMany([
             ["test", 1],
@@ -43,7 +43,7 @@ describe("Cache", () => {
         ]);
 
         expect(cache.length).toBe(2);
-        expect(cache.getMany(["test", "test3"])).toEqual([1, null]);
+        expect(cache.getMany(["test", "test3"])).toEqual([1, undefined]);
     });
 
     it("should throw error if given key is not found", () => {
@@ -106,7 +106,7 @@ describe("Cache", () => {
         cache.set("test", 1);
         cache.set("test2", 2);
 
-        expect(cache.get("test3")).toBe(null);
+        expect(cache.get("test3")).toBe(undefined);
     });
 
     it("should be able to set time to live", async () => {

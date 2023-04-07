@@ -10,6 +10,7 @@ import { SearchInput } from "@common/search-input.dto";
 import { MediaObject, MediaObjectMap, MediaTypeFromObject } from "@common/types";
 
 import { CacheStorage } from "@utils/cache";
+import { Nullable } from "@utils/types";
 
 interface SearchInputData extends SearchInput {
     resolver: BaseResolver<string, any>;
@@ -27,7 +28,7 @@ export class ObjectService<TItem extends MediaObject, TMediaType extends MediaTy
         keyBuilder: ({ resolver, locale, limit, query }) => `${resolver.getServiceName()}_${locale}_${limit}_${query}`,
     });
 
-    private readonly itemCache = new CacheStorage<ItemCacheData, MediaObjectMap[TMediaType]>({
+    private readonly itemCache = new CacheStorage<ItemCacheData, Nullable<MediaObjectMap[TMediaType]>>({
         keyBuilder: ({ id, locale }) => `${id}_${locale}`,
     });
 
@@ -90,35 +91,39 @@ export class ObjectService<TItem extends MediaObject, TMediaType extends MediaTy
         return null;
     }
     public async getItems(inputIds: string[], locale?: string) {
-        const ids = inputIds.map(id => ({ id, locale }));
-        const results: MediaObjectMap[TMediaType][] = [];
-        const cachedIds = ids.filter(id => this.itemCache.has(id));
-        const cachedItems = this.itemCache.getManyOrThrow(cachedIds);
-        results.push(...cachedItems);
+        const ids = _.uniq(inputIds);
+        const items = new Map<string, Nullable<MediaObjectMap[TMediaType]>>();
+        const missingIds = new Set(ids);
 
-        const newIds = ids.filter(id => !this.itemCache.has(id));
-        const newItems: MediaObjectMap[TMediaType][] = [];
+        for (const id of ids) {
+            if (this.itemCache.has({ id, locale })) {
+                items.set(id, this.itemCache.getOrThrow({ id, locale }));
+                missingIds.delete(id);
+            }
+        }
+
         for (const [, resolver] of this.metadata.getResolvers()) {
-            const targetIds = newIds.map(({ id }) => resolver.getRawId(id)).filter((id): id is string => !!id);
-            if (targetIds.length === 0) {
+            const rawIds = ids
+                .filter(id => missingIds.has(id))
+                .map(id => resolver.getRawId(id))
+                .filter((id): id is string => id !== null);
+
+            if (rawIds.length === 0) {
                 continue;
             }
 
-            const items = await resolver.getItems(targetIds, this.type, locale);
-            newItems.push(...items);
+            const results = await resolver.getItems(rawIds, this.type, locale);
+            for (let i = 0; i < results.length; i++) {
+                const id = ids[i];
+                const item = results[i];
+
+                items.set(id, item);
+                missingIds.delete(id);
+
+                this.itemCache.set({ id, locale }, item);
+            }
         }
 
-        this.itemCache.setMany(newItems.map(item => [{ id: item.id, locale }, item]));
-        results.push(...newItems);
-
-        const resultMap = _.chain(results).keyBy("id").value();
-        return ids.map(({ id }) => {
-            const item = resultMap[id];
-            if (!item) {
-                throw new Error(`Requested resource with id ('${id}') not found`);
-            }
-
-            return item;
-        });
+        return ids.map(id => items.get(id) || null);
     }
 }

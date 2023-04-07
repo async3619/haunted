@@ -48,12 +48,12 @@ export class CacheStorage<TKey, TValue> {
         const keyString = this.keyBuilder(key);
         const item = this.container.get(keyString);
         if (!item) {
-            return null;
+            return undefined;
         }
 
         if (!this.isAlive(item)) {
             this.delete(key);
-            return null;
+            return undefined;
         }
 
         return item;
@@ -74,18 +74,18 @@ export class CacheStorage<TKey, TValue> {
         return items.map(([key, value]) => this.set(key, value));
     }
 
-    public get(key: TKey): TValue | null {
-        return this.getItem(key)?.value || null;
+    public get(key: TKey): TValue | undefined {
+        return this.getItem(key)?.value;
     }
     public getOrThrow(key: TKey): TValue {
         const value = this.get(key);
-        if (!value) {
-            throw new Error(`Cache item with key ${key} not found`);
+        if (value === undefined) {
+            throw new Error(`Cache item with key ${JSON.stringify(key)} not found`);
         }
 
         return value;
     }
-    public getMany(keys: TKey[]): (TValue | null)[] {
+    public getMany(keys: TKey[]): (TValue | undefined)[] {
         return keys.map(key => this.get(key));
     }
     public getManyOrThrow(keys: TKey[]): TValue[] {

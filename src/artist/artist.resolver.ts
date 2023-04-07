@@ -8,6 +8,8 @@ import { GetItemsInput } from "@common/get-items-input.dto";
 import { GetItemInput } from "@common/get-item-input.dto";
 import { Artist } from "@common/artist.dto";
 
+import { Nullable } from "@utils/types";
+
 @Resolver()
 export class ArtistResolver {
     public constructor(@Inject(ArtistService) private readonly artistService: ArtistService) {}
@@ -15,14 +17,14 @@ export class ArtistResolver {
     @Query(() => Artist, { nullable: true })
     public async artist(
         @Args("input", { type: () => GetItemInput }) { locale, id }: GetItemInput,
-    ): Promise<Artist | null> {
+    ): Promise<Nullable<Artist>> {
         return this.artistService.getItem(id, locale);
     }
 
-    @Query(() => [Artist])
+    @Query(() => [Artist], { nullable: "items" })
     public async artists(
         @Args("input", { type: () => GetItemsInput }) { locale, ids }: GetItemsInput,
-    ): Promise<Artist[]> {
+    ): Promise<Nullable<Artist>[]> {
         return this.artistService.getItems(ids, locale);
     }
 

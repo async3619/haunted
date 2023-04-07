@@ -9,30 +9,63 @@ import { Router } from "@root/router";
 describe("Album (e2e)", () => {
     let app: NestExpressApplication;
     let url: string;
+    let client: ReturnType<typeof createTRPCProxyClient<Router>>;
 
     beforeEach(async () => {
         const result = await initializeE2E();
         app = result.app;
         url = result.url;
+        client = createTRPCProxyClient<Router>({
+            links: [
+                httpBatchLink({
+                    url: `${url}/trpc`,
+                }),
+            ],
+        });
     });
 
     afterEach(async () => {
         await app.close();
     });
 
-    describe("searchAlbums (TRPC)", () => {
-        let client: ReturnType<typeof createTRPCProxyClient<Router>>;
-
-        beforeEach(() => {
-            client = createTRPCProxyClient<Router>({
-                links: [
-                    httpBatchLink({
-                        url: `${url}/trpc`,
-                    }),
-                ],
-            });
+    describe("albums (TRPC)", () => {
+        it("should be able to get albums", async () => {
+            expectContainPartially(
+                await client.albums.query({
+                    ids: ["spotify::5KyAvL3uY3CsyNXPjKmDyU"],
+                }),
+                {
+                    title: "Independent Music",
+                    artists: [expect.objectContaining({ name: "CHOILB" })],
+                },
+            );
         });
 
+        it("should respect locale", async () => {
+            expectContainPartially(
+                await client.albums.query({
+                    ids: ["spotify::5KyAvL3uY3CsyNXPjKmDyU"],
+                }),
+                {
+                    title: "Independent Music",
+                    artists: [expect.objectContaining({ name: "CHOILB" })],
+                },
+            );
+
+            expectContainPartially(
+                await client.albums.query({
+                    ids: ["spotify::5KyAvL3uY3CsyNXPjKmDyU"],
+                    locale: "ko_KR",
+                }),
+                {
+                    title: "독립음악",
+                    artists: [expect.objectContaining({ name: "최엘비" })],
+                },
+            );
+        });
+    });
+
+    describe("searchAlbums (TRPC)", () => {
         it("should be able to search albums", async () => {
             expectContainPartially(
                 await client.searchAlbums.query({

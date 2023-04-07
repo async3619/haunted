@@ -70,11 +70,33 @@ export class CacheStorage<TKey, TValue> {
 
         return item;
     }
+    public setMany(items: [TKey, TValue][]) {
+        return items.map(([key, value]) => this.set(key, value));
+    }
+
     public get(key: TKey): TValue | null {
         return this.getItem(key)?.value || null;
     }
+    public getOrThrow(key: TKey): TValue {
+        const value = this.get(key);
+        if (!value) {
+            throw new Error(`Cache item with key ${key} not found`);
+        }
+
+        return value;
+    }
+    public getMany(keys: TKey[]): (TValue | null)[] {
+        return keys.map(key => this.get(key));
+    }
+    public getManyOrThrow(keys: TKey[]): TValue[] {
+        return keys.map(key => this.getOrThrow(key));
+    }
+
     public exists(key: TKey) {
         return !!this.getItem(key);
+    }
+    public has(key: TKey) {
+        return this.exists(key);
     }
 
     public clear() {

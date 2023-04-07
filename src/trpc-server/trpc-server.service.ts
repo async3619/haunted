@@ -13,13 +13,22 @@ import { ConfigData } from "@config/config.module";
 import { InjectConfig } from "@config/config.decorator";
 
 import { SearchInput } from "@common/search-input.dto";
-
-import { RouteArgs } from "@trpc-server/types";
+import { GetItemsInput } from "@common/get-items-input.dto";
 
 @Injectable()
 export class TRPCServerService {
     private readonly t = initTRPC.create();
     private readonly appRouter = this.t.router({
+        tracks: this.t.procedure.input(createAssert<GetItemsInput>()).query(({ input }) => {
+            return this.trackService.getItems(input.ids, input.locale);
+        }),
+        albums: this.t.procedure.input(createAssert<GetItemsInput>()).query(({ input }) => {
+            return this.albumService.getItems(input.ids, input.locale);
+        }),
+        artists: this.t.procedure.input(createAssert<GetItemsInput>()).query(({ input }) => {
+            return this.artistService.getItems(input.ids, input.locale);
+        }),
+
         searchAlbums: this.t.procedure.input(createAssert<SearchInput>()).query(({ input }) => {
             return this.albumService.search(input);
         }),
@@ -52,17 +61,5 @@ export class TRPCServerService {
 
     public getRouter() {
         return this.appRouter;
-    }
-
-    public searchTracks({ input }: RouteArgs<SearchInput>) {
-        return this.trackService.search(input);
-    }
-
-    public searchAlbums({ input }: RouteArgs<SearchInput>) {
-        return this.albumService.search(input);
-    }
-
-    public searchArtists({ input }: RouteArgs<SearchInput>) {
-        return this.artistService.search(input);
     }
 }

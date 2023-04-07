@@ -31,6 +31,8 @@ interface ApiParameters {
         locale?: string;
     }) => SpotifyApi.SearchResponse;
     "/v1/albums": (params: { ids: string[]; locale?: string }) => SpotifyApi.MultipleAlbumsResponse;
+    "/v1/artists": (params: { ids: string[]; locale?: string }) => SpotifyApi.MultipleArtistsResponse;
+    "/v1/tracks": (params: { ids: string[]; locale?: string }) => SpotifyApi.MultipleTracksResponse;
 }
 
 export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOptions> {
@@ -88,39 +90,29 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
         };
     }
 
+    protected async getTracks(ids: string[], locale?: string): Promise<RawTrack[]> {
+        const { body } = await this.request("/v1/tracks", { ids, locale });
+
+        return body.tracks.map(this.composeTrack);
+    }
+    protected async getAlbums(ids: string[], locale?: string): Promise<RawAlbum[]> {
+        const { body } = await this.request("/v1/albums", { ids, locale });
+
+        return body.albums.map(this.composeAlbum);
+    }
+    protected async getArtists(ids: string[], locale?: string): Promise<RawArtist[]> {
+        const { body } = await this.request("/v1/artists", { ids, locale });
+
+        return body.artists.map(this.composeArtist);
+    }
+
     protected async searchTrack({ query, limit = 20, locale }: SearchInput): Promise<RawTrack[]> {
         const { body } = await this.request("/v1/search", { q: query, type: ["track"], limit, locale });
         if (!body.tracks) {
             throw new Error("Invalid response");
         }
 
-        return body.tracks.items.map(item => ({
-            id: item.id,
-            title: item.name,
-            track: item.track_number,
-            disc: item.disc_number,
-            duration: item.duration_ms,
-            year: item.album.release_date,
-            artists: item.artists.map(artist => ({
-                id: artist.id,
-                name: artist.name,
-            })),
-            album: {
-                id: item.album.id,
-                title: item.album.name,
-                releaseDate: item.album.release_date,
-                trackCount: item.album.total_tracks,
-                artists: item.album.artists.map(artist => ({
-                    id: artist.id,
-                    name: artist.name,
-                })),
-                albumArts: item.album.images.map(image => ({
-                    url: image.url,
-                    width: image.width,
-                    height: image.height,
-                })),
-            },
-        }));
+        return body.tracks.items.map(this.composeTrack);
     }
     protected async searchAlbum({ query, limit = 20, locale }: SearchInput): Promise<RawAlbum[]> {
         const { body } = await this.request("/v1/search", { q: query, type: ["album"], limit, locale });
@@ -135,33 +127,7 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
             locale,
         });
 
-        return albums.map<RawAlbum>(item => ({
-            id: item.id,
-            title: item.name,
-            releaseDate: item.release_date,
-            trackCount: item.total_tracks,
-            artists: item.artists.map(artist => ({
-                id: artist.id,
-                name: artist.name,
-            })),
-            albumArts: item.images.map(image => ({
-                url: image.url,
-                width: image.width,
-                height: image.height,
-            })),
-            tracks: item.tracks.items.map(track => ({
-                id: track.id,
-                title: track.name,
-                track: track.track_number,
-                disc: track.disc_number,
-                duration: track.duration_ms,
-                year: item.release_date,
-                artists: track.artists.map(artist => ({
-                    id: artist.id,
-                    name: artist.name,
-                })),
-            })),
-        }));
+        return albums.map(this.composeAlbum);
     }
     protected async searchArtist({ query, limit = 20, locale }: SearchInput): Promise<RawArtist[]> {
         const { body } = await this.request("/v1/search", { q: query, type: ["artist"], limit, locale });
@@ -169,14 +135,76 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
             throw new Error("Invalid response");
         }
 
-        return body.artists.items.map(item => ({
-            id: item.id,
-            name: item.name,
-            artistImages: item.images.map(image => ({
+        return body.artists.items.map(this.composeArtist);
+    }
+
+    private composeTrack(track: SpotifyApi.TrackObjectFull) {
+        return {
+            id: track.id,
+            title: track.name,
+            track: track.track_number,
+            disc: track.disc_number,
+            duration: track.duration_ms,
+            year: track.album.release_date,
+            album: {
+                id: track.album.id,
+                title: track.album.name,
+                releaseDate: track.album.release_date,
+                trackCount: track.album.total_tracks,
+                artists: track.album.artists.map(artist => ({
+                    id: artist.id,
+                    name: artist.name,
+                })),
+                albumArts: track.album.images.map(image => ({
+                    url: image.url,
+                    width: image.width,
+                    height: image.height,
+                })),
+            },
+            artists: track.artists.map(artist => ({
+                id: artist.id,
+                name: artist.name,
+            })),
+        };
+    }
+    private composeAlbum(album: SpotifyApi.AlbumObjectFull) {
+        return {
+            id: album.id,
+            title: album.name,
+            releaseDate: album.release_date,
+            trackCount: album.total_tracks,
+            artists: album.artists.map(artist => ({
+                id: artist.id,
+                name: artist.name,
+            })),
+            albumArts: album.images.map(image => ({
                 url: image.url,
                 width: image.width,
                 height: image.height,
             })),
-        }));
+            tracks: album.tracks.items.map(track => ({
+                id: track.id,
+                title: track.name,
+                track: track.track_number,
+                disc: track.disc_number,
+                duration: track.duration_ms,
+                year: album.release_date,
+                artists: track.artists.map(artist => ({
+                    id: artist.id,
+                    name: artist.name,
+                })),
+            })),
+        };
+    }
+    private composeArtist(artist: SpotifyApi.ArtistObjectFull) {
+        return {
+            id: artist.id,
+            name: artist.name,
+            artistImages: artist.images.map(image => ({
+                url: image.url,
+                width: image.width,
+                height: image.height,
+            })),
+        };
     }
 }

@@ -38,4 +38,14 @@ describe("AlbumResolver", () => {
             limit: 10,
         });
     });
+
+    it("should be able to get items", async () => {
+        await resolver.albums({
+            ids: ["mocked::1", "mocked::2", "mocked::3"],
+            locale: "en",
+        });
+
+        expect(mockedResolver.getAlbums).toBeCalledTimes(1);
+        expect(mockedResolver.getAlbums).toBeCalledWith(["1", "2", "3"], "en");
+    });
 });

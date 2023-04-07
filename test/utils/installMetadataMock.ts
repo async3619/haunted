@@ -12,6 +12,9 @@ export class MockResolver extends BaseResolver<"Mocked", any> {
     public searchTrack = jest.fn().mockResolvedValue([]);
     public searchAlbum = jest.fn().mockResolvedValue([]);
     public searchArtist = jest.fn().mockResolvedValue([]);
+    public getTracks = jest.fn().mockImplementation(ids => ids.map(id => ({ id })));
+    public getAlbums = jest.fn().mockImplementation(ids => ids.map(id => ({ id })));
+    public getArtists = jest.fn().mockImplementation(ids => ids.map(id => ({ id })));
 }
 
 export function installMetadataMock(metadataService: MetadataService) {

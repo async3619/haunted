@@ -38,4 +38,14 @@ describe("ArtistResolver", () => {
             limit: 10,
         });
     });
+
+    it("should be able to get items", async () => {
+        await resolver.artists({
+            ids: ["mocked::1", "mocked::2", "mocked::3"],
+            locale: "en",
+        });
+
+        expect(mockedResolver.getArtists).toBeCalledTimes(1);
+        expect(mockedResolver.getArtists).toBeCalledWith(["1", "2", "3"], "en");
+    });
 });

@@ -63,9 +63,17 @@ type Track {
 }
 
 type Query {
+  tracks(input: GetItemsInput!): [Track!]!
   searchTracks(input: SearchInput!): [Track!]!
+  albums(input: GetItemsInput!): [Album!]!
   searchAlbums(input: SearchInput!): [Album!]!
+  artists(input: GetItemsInput!): [Artist!]!
   searchArtists(input: SearchInput!): [Artist!]!
+}
+
+input GetItemsInput {
+  ids: [String!]!
+  locale: String
 }
 
 input SearchInput {

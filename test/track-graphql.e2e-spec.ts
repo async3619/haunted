@@ -6,6 +6,8 @@ import { initializeE2E } from "@test/utils/initializeE2E";
 
 import { Track } from "@common/track.dto";
 import { SearchInput } from "@common/search-input.dto";
+import { GetItemsInput } from "@common/get-items-input.dto";
+import { expectContainPartially } from "@test/utils/expectContainPartially";
 
 const searchTracksQuery = gql<{ searchTracks: PartialDeep<Track> }, { input: SearchInput }>`
     query ($input: SearchInput!) {
@@ -19,32 +21,67 @@ const searchTracksQuery = gql<{ searchTracks: PartialDeep<Track> }, { input: Sea
         }
     }
 `;
+const tracksQuery = gql<{ tracks: PartialDeep<Track>[] }, { input: GetItemsInput }>`
+    query ($input: GetItemsInput!) {
+        tracks(input: $input) {
+            id
+            title
+            artists {
+                id
+                name
+            }
+        }
+    }
+`;
 
 describe("Track (e2e)", () => {
     let app: NestExpressApplication;
     let url: string;
+    let client: Client;
 
     beforeEach(async () => {
         const result = await initializeE2E();
         app = result.app;
         url = result.url;
+
+        client = new Client({
+            url: `${url}/graphql`,
+            exchanges: [cacheExchange, fetchExchange],
+            requestPolicy: "network-only",
+        });
     });
 
     afterEach(async () => {
         await app.close();
     });
 
-    describe("searchTracks (GraphQL)", () => {
-        let client: Client;
+    describe("tracks (GraphQL)", () => {
+        it("should be able to get tracks", async () => {
+            const { data } = await client
+                .query(tracksQuery, { input: { ids: ["spotify::7Jin5db4i7evTFvtGU1Am1"] } })
+                .toPromise();
 
-        beforeEach(() => {
-            client = new Client({
-                url: `${url}/graphql`,
-                exchanges: [cacheExchange, fetchExchange],
-                requestPolicy: "network-only",
+            expectContainPartially(data?.tracks, {
+                id: "spotify::7Jin5db4i7evTFvtGU1Am1",
+                title: "Independent Music",
             });
         });
 
+        it("should respect locale", async () => {
+            const result_en = await client
+                .query(tracksQuery, { input: { ids: ["spotify::7Jin5db4i7evTFvtGU1Am1"] } })
+                .toPromise();
+
+            const result_ko = await client
+                .query(tracksQuery, { input: { ids: ["spotify::7Jin5db4i7evTFvtGU1Am1"], locale: "ko" } })
+                .toPromise();
+
+            expect(result_en.data?.tracks[0].title).toBe("Independent Music");
+            expect(result_ko.data?.tracks[0].title).toBe("독립음악");
+        });
+    });
+
+    describe("searchTracks (GraphQL)", () => {
         it("should be able to search tracks", async () => {
             const { data } = await client
                 .query(searchTracksQuery, { input: { query: "WYBH save my life but...", limit: 1 } })

@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { OnModuleInit } from "@nestjs/common";
 
 import { MetadataService } from "@metadata/metadata.service";
@@ -14,11 +15,20 @@ interface SearchInputData extends SearchInput {
     resolver: BaseResolver<string, any>;
 }
 
+interface ItemCacheData {
+    id: string;
+    locale?: string;
+}
+
 export class ObjectService<TItem extends MediaObject, TMediaType extends MediaTypeFromObject<TItem>>
     implements OnModuleInit
 {
     private readonly searchCache = new CacheStorage<SearchInputData, MediaObjectMap[TMediaType][]>({
         keyBuilder: ({ resolver, locale, limit, query }) => `${resolver.getServiceName()}_${locale}_${limit}_${query}`,
+    });
+
+    private readonly itemCache = new CacheStorage<ItemCacheData, MediaObjectMap[TMediaType]>({
+        keyBuilder: ({ id, locale }) => `${id}_${locale}`,
     });
 
     constructor(
@@ -57,5 +67,38 @@ export class ObjectService<TItem extends MediaObject, TMediaType extends MediaTy
         }
 
         return results;
+    }
+
+    public async getItems(inputIds: string[], locale?: string) {
+        const ids = inputIds.map(id => ({ id, locale }));
+        const results: MediaObjectMap[TMediaType][] = [];
+        const cachedIds = ids.filter(id => this.itemCache.has(id));
+        const cachedItems = this.itemCache.getManyOrThrow(cachedIds);
+        results.push(...cachedItems);
+
+        const newIds = ids.filter(id => !this.itemCache.has(id));
+        const newItems: MediaObjectMap[TMediaType][] = [];
+        for (const [, resolver] of this.metadata.getResolvers()) {
+            const targetIds = newIds.map(({ id }) => resolver.getRawId(id)).filter((id): id is string => !!id);
+            if (targetIds.length === 0) {
+                continue;
+            }
+
+            const items = await resolver.getItems(targetIds, this.type, locale);
+            newItems.push(...items);
+        }
+
+        this.itemCache.setMany(newItems.map(item => [{ id: item.id, locale }, item]));
+        results.push(...newItems);
+
+        const resultMap = _.chain(results).keyBy("id").value();
+        return ids.map(({ id }) => {
+            const item = resultMap[id];
+            if (!item) {
+                throw new Error(`Requested resource with id ('${id}') not found`);
+            }
+
+            return item;
+        });
     }
 }

@@ -8,7 +8,7 @@
         "email": "me@sophia-dev.io"
     },
     "license": "MIT",
-    "types": "./dist/index.d.ts",
+    "types": "./dist/router.d.ts",
     "scripts": {
         "build": "ttsc -p tsconfig.build.json",
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -82,7 +82,7 @@
         "prettier": "^2.3.2",
         "rimraf": "^4.4.1",
         "semantic-release": "^21.0.1",
-        "source-map-support": "^0.5.20",
+        "source-map-support": "^0.5.21",
         "ts-jest": "29.0.5",
         "ts-node": "^10.9.1",
         "tsc-alias": "^1.8.5",

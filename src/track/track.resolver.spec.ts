@@ -38,4 +38,14 @@ describe("TrackResolver", () => {
             limit: 10,
         });
     });
+
+    it("should be able to get items", async () => {
+        await resolver.tracks({
+            ids: ["mocked::1", "mocked::2", "mocked::3"],
+            locale: "en",
+        });
+
+        expect(mockedResolver.getTracks).toBeCalledTimes(1);
+        expect(mockedResolver.getTracks).toBeCalledWith(["1", "2", "3"], "en");
+    });
 });

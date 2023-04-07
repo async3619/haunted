@@ -23,11 +23,19 @@ export default abstract class BaseResolver<
     public getOptions() {
         return _.cloneDeep(this.options);
     }
+    public getServiceName() {
+        return this.getName().toLowerCase();
+    }
+
     public getId(id: string) {
         return `${this.getServiceName()}::${id}`;
     }
-    public getServiceName() {
-        return this.getName().toLowerCase();
+    public getRawId(id: string) {
+        if (!id.startsWith(`${this.getServiceName()}::`)) {
+            return null;
+        }
+
+        return id.replace(`${this.getServiceName()}::`, "");
     }
 
     public abstract initialize(): Promise<void>;
@@ -55,6 +63,38 @@ export default abstract class BaseResolver<
             serviceName: this.getServiceName(),
         }));
     }
+
+    public async getItems<Type extends MediaType>(
+        ids: string[],
+        type: Type,
+        locale?: string,
+    ): Promise<MediaObjectMap[Type][]> {
+        const rawData = await (async () => {
+            switch (type) {
+                case "track":
+                    return await this.getTracks(ids, locale);
+
+                case "album":
+                    return await this.getAlbums(ids, locale);
+
+                case "artist":
+                    return await this.getArtists(ids, locale);
+
+                default:
+                    throw new Error(`Unknown type: ${type}`);
+            }
+        })();
+
+        return rawData.map(item => ({
+            ...item,
+            id: this.getId(item.id),
+            serviceName: this.getServiceName(),
+        }));
+    }
+
+    protected abstract getTracks(ids: string[], locale?: string): Promise<RawTrack[]>;
+    protected abstract getAlbums(ids: string[], locale?: string): Promise<RawAlbum[]>;
+    protected abstract getArtists(ids: string[], locale?: string): Promise<RawArtist[]>;
 
     protected abstract searchTrack(input: SearchInput): Promise<RawTrack[]>;
     protected abstract searchAlbum(input: SearchInput): Promise<RawAlbum[]>;

@@ -9,7 +9,6 @@ export class MockResolver extends BaseResolver<"Mocked", any> {
     }
 
     public initialize = jest.fn();
-    public search = jest.fn().mockResolvedValue({ albums: [], tracks: [], artists: [] });
     public searchTrack = jest.fn().mockResolvedValue([]);
     public searchAlbum = jest.fn().mockResolvedValue([]);
     public searchArtist = jest.fn().mockResolvedValue([]);

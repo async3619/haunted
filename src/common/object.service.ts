@@ -6,23 +6,25 @@ import BaseResolver from "@metadata/resolvers/base";
 import { ConfigData } from "@config/config.module";
 
 import { SearchInput } from "@common/search-input.dto";
+import { MediaObject, MediaObjectMap, MediaTypeFromObject } from "@common/types";
 
 import { CacheStorage } from "@utils/cache";
-import { AsyncFn } from "@utils/types";
 
 interface SearchInputData extends SearchInput {
     resolver: BaseResolver<string, any>;
 }
 
-export class ObjectService<TItem> implements OnModuleInit {
-    private readonly searchCache = new CacheStorage<SearchInputData, TItem[]>({
-        keyBuilder: ({ resolver, locale, limit, query }) => `${resolver.getName()}_${locale}_${limit}_${query}`,
+export class ObjectService<TItem extends MediaObject, TMediaType extends MediaTypeFromObject<TItem>>
+    implements OnModuleInit
+{
+    private readonly searchCache = new CacheStorage<SearchInputData, MediaObjectMap[TMediaType][]>({
+        keyBuilder: ({ resolver, locale, limit, query }) => `${resolver.getServiceName()}_${locale}_${limit}_${query}`,
     });
 
     constructor(
         private readonly metadata: MetadataService,
         private readonly config: ConfigData,
-        private readonly searchFn: AsyncFn<SearchInputData, TItem[]>,
+        private readonly type: TMediaType,
     ) {}
 
     public onModuleInit() {
@@ -35,7 +37,7 @@ export class ObjectService<TItem> implements OnModuleInit {
     }
 
     public async search(input: SearchInput) {
-        const results: TItem[] = [];
+        const results: MediaObjectMap[TMediaType][] = [];
         for (const [, resolver] of this.metadata.getResolvers()) {
             const inputData: SearchInputData = {
                 ...input,
@@ -48,7 +50,7 @@ export class ObjectService<TItem> implements OnModuleInit {
                 continue;
             }
 
-            const items = await this.searchFn(inputData);
+            const items = await resolver.search(input, this.type);
             this.searchCache.set(inputData, items);
 
             results.push(...items);

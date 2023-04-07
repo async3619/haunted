@@ -10,11 +10,11 @@ import { InjectConfig } from "@config/config.decorator";
 import { ObjectService } from "@common/object.service";
 
 @Injectable()
-export class AlbumService extends ObjectService<Album> {
+export class AlbumService extends ObjectService<Album, "album"> {
     public constructor(
         @Inject(MetadataService) private readonly metadataService: MetadataService,
         @InjectConfig() private readonly configData: ConfigData,
     ) {
-        super(metadataService, configData, ({ resolver, ...input }) => resolver.searchAlbum(input));
+        super(metadataService, configData, "album");
     }
 }

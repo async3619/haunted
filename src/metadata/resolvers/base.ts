@@ -1,9 +1,10 @@
 import _ from "lodash";
 
 import { SearchInput } from "@common/search-input.dto";
-import { Track } from "@common/track.dto";
-import { Artist } from "@common/artist.dto";
-import { Album } from "@common/album.dto";
+import { RawTrack } from "@common/track.dto";
+import { RawArtist } from "@common/artist.dto";
+import { RawAlbum } from "@common/album.dto";
+import { MediaObjectMap, MediaType } from "@common/types";
 
 import { Loggable } from "@utils/loggable";
 
@@ -23,12 +24,39 @@ export default abstract class BaseResolver<
         return _.cloneDeep(this.options);
     }
     public getId(id: string) {
-        return `${this.getName()}::${id}`;
+        return `${this.getServiceName()}::${id}`;
+    }
+    public getServiceName() {
+        return this.getName().toLowerCase();
     }
 
     public abstract initialize(): Promise<void>;
 
-    public abstract searchTrack(input: SearchInput): Promise<Track[]>;
-    public abstract searchAlbum(input: SearchInput): Promise<Album[]>;
-    public abstract searchArtist(input: SearchInput): Promise<Artist[]>;
+    public async search<Type extends MediaType>(input: SearchInput, type: Type): Promise<MediaObjectMap[Type][]> {
+        const rawData = await (async () => {
+            switch (type) {
+                case "track":
+                    return await this.searchTrack(input);
+
+                case "album":
+                    return await this.searchAlbum(input);
+
+                case "artist":
+                    return await this.searchArtist(input);
+
+                default:
+                    throw new Error(`Unknown type: ${type}`);
+            }
+        })();
+
+        return rawData.map(item => ({
+            ...item,
+            id: this.getId(item.id),
+            serviceName: this.getServiceName(),
+        }));
+    }
+
+    protected abstract searchTrack(input: SearchInput): Promise<RawTrack[]>;
+    protected abstract searchAlbum(input: SearchInput): Promise<RawAlbum[]>;
+    protected abstract searchArtist(input: SearchInput): Promise<RawArtist[]>;
 }

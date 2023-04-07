@@ -8,29 +8,58 @@ type Image {
   height: Int
 }
 
-type Track {
+type Artist {
+  id: String!
+  serviceName: String!
+  name: String!
+  artistImages: [Image!]!
+}
+
+type PartialArtist {
+  id: String!
+  name: String!
+}
+
+type AlbumTrack {
+  id: String!
   title: String!
-  artists: [String!]!
-  album: String!
-  albumArtists: String!
   duration: Int!
   track: Int!
   disc: Int!
   year: String!
+  artists: [PartialArtist!]!
 }
 
 type Album {
+  id: String!
+  serviceName: String!
   title: String!
-  artists: [String!]!
+  artists: [PartialArtist!]!
   releaseDate: String!
   trackCount: Int!
   albumArts: [Image!]!
-  tracks: [Track!]!
+  tracks: [AlbumTrack!]!
 }
 
-type Artist {
-  name: String!
-  artistImages: [Image!]!
+type TrackAlbum {
+  id: String!
+  title: String!
+  artists: [PartialArtist!]!
+  releaseDate: String!
+  trackCount: Int!
+  albumArts: [Image!]!
+}
+
+type Track {
+  id: String!
+  serviceName: String!
+  title: String!
+  duration: Int!
+  track: Int!
+  disc: Int!
+  year: String!
+  artists: [PartialArtist!]!
+  album: TrackAlbum!
 }
 
 type Query {

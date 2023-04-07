@@ -9,11 +9,11 @@ import { ObjectService } from "@common/object.service";
 import { Artist } from "@common/artist.dto";
 
 @Injectable()
-export class ArtistService extends ObjectService<Artist> {
+export class ArtistService extends ObjectService<Artist, "artist"> {
     public constructor(
         @Inject(MetadataService) private readonly metadataService: MetadataService,
         @InjectConfig() private readonly configData: ConfigData,
     ) {
-        super(metadataService, configData, ({ resolver, ...input }) => resolver.searchArtist(input));
+        super(metadataService, configData, "artist");
     }
 }

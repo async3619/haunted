@@ -37,9 +37,12 @@ describe("SpotifyResolver", () => {
     it("should be able to search for tracks", async () => {
         await resolver.initialize();
 
-        const result = await resolver.searchTrack({
-            query: "Money Breath",
-        });
+        const result = await resolver.search(
+            {
+                query: "Money Breath",
+            },
+            "track",
+        );
 
         expect(result).toBeDefined();
         expect(result.length).toBeGreaterThan(0);
@@ -48,9 +51,12 @@ describe("SpotifyResolver", () => {
     it("should be able to search for albums", async () => {
         await resolver.initialize();
 
-        const result = await resolver.searchAlbum({
-            query: "Money Breath",
-        });
+        const result = await resolver.search(
+            {
+                query: "Money Breath",
+            },
+            "album",
+        );
 
         expect(result).toBeDefined();
         expect(result.length).toBeGreaterThan(0);
@@ -59,9 +65,12 @@ describe("SpotifyResolver", () => {
     it("should be able to search for artists", async () => {
         await resolver.initialize();
 
-        const result = await resolver.searchArtist({
-            query: "QM",
-        });
+        const result = await resolver.search(
+            {
+                query: "QM",
+            },
+            "artist",
+        );
 
         expect(result).toBeDefined();
         expect(result.length).toBeGreaterThan(0);
@@ -70,9 +79,9 @@ describe("SpotifyResolver", () => {
     it("should throw an error when search result is corrupted", async () => {
         resolver["request"] = jest.fn().mockResolvedValue({ body: {} });
 
-        await expect(resolver.searchTrack({ query: "" })).rejects.toThrow("Invalid response");
-        await expect(resolver.searchAlbum({ query: "" })).rejects.toThrow("Invalid response");
-        await expect(resolver.searchArtist({ query: "" })).rejects.toThrow("Invalid response");
+        await expect(resolver.search({ query: "" }, "artist")).rejects.toThrow("Invalid response");
+        await expect(resolver.search({ query: "" }, "track")).rejects.toThrow("Invalid response");
+        await expect(resolver.search({ query: "" }, "album")).rejects.toThrow("Invalid response");
     });
 
     it("should refresh access token automatically when it expires", async () => {
@@ -89,7 +98,7 @@ describe("SpotifyResolver", () => {
             },
         });
 
-        await expect(resolver.searchTrack({ query: "돈숨" })).resolves.not.toThrow();
+        await expect(resolver.search({ query: "돈숨" }, "album")).resolves.not.toThrow();
     });
 
     it("should throw an error when api returns an error", async () => {
@@ -104,6 +113,6 @@ describe("SpotifyResolver", () => {
             },
         });
 
-        await expect(resolver.searchTrack({ query: "돈숨" })).rejects.toThrow("Bad request (400)");
+        await expect(resolver.search({ query: "돈숨" }, "album")).rejects.toThrow("Bad request (400)");
     });
 });

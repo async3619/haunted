@@ -10,11 +10,11 @@ import { ObjectService } from "@common/object.service";
 import { Track } from "@common/track.dto";
 
 @Injectable()
-export class TrackService extends ObjectService<Track> {
+export class TrackService extends ObjectService<Track, "track"> {
     public constructor(
         @Inject(MetadataService) private readonly metadataService: MetadataService,
         @InjectConfig() private readonly configData: ConfigData,
     ) {
-        super(metadataService, configData, ({ resolver, ...input }) => resolver.searchTrack(input));
+        super(metadataService, configData, "track");
     }
 }

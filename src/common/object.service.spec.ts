@@ -3,9 +3,9 @@ import { ConfigData, DEFAULT_CONFIG } from "@config/config.module";
 
 import { MetadataServiceMock } from "@test/utils/metadata.service.mock";
 
-class MockService extends ObjectService<any> {
+class MockService extends ObjectService<any, "artist"> {
     public constructor(config: ConfigData = DEFAULT_CONFIG) {
-        super(new MetadataServiceMock(), config, async () => [{ test: "value" }]);
+        super(new MetadataServiceMock(), config, "artist");
     }
 }
 

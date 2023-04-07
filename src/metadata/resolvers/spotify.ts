@@ -2,9 +2,9 @@ import { is } from "typia";
 import SpotifyWebApi from "spotify-web-api-node";
 
 import { SearchInput } from "@common/search-input.dto";
-import { Track } from "@common/track.dto";
-import { Album } from "@common/album.dto";
-import { Artist } from "@common/artist.dto";
+import { RawTrack } from "@common/track.dto";
+import { RawAlbum } from "@common/album.dto";
+import { RawArtist } from "@common/artist.dto";
 
 import BaseResolver from "@metadata/resolvers/base";
 import { JsonResponse, Request } from "@utils/request";
@@ -88,24 +88,41 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
         };
     }
 
-    public async searchTrack({ query, limit = 20, locale }: SearchInput): Promise<Track[]> {
+    protected async searchTrack({ query, limit = 20, locale }: SearchInput): Promise<RawTrack[]> {
         const { body } = await this.request("/v1/search", { q: query, type: ["track"], limit, locale });
         if (!body.tracks) {
             throw new Error("Invalid response");
         }
 
         return body.tracks.items.map(item => ({
+            id: item.id,
             title: item.name,
-            artists: item.artists.map(artist => artist.name),
             track: item.track_number,
             disc: item.disc_number,
             duration: item.duration_ms,
-            album: item.album.name,
             year: item.album.release_date,
-            albumArtists: item.album.artists.map(artist => artist.name),
+            artists: item.artists.map(artist => ({
+                id: artist.id,
+                name: artist.name,
+            })),
+            album: {
+                id: item.album.id,
+                title: item.album.name,
+                releaseDate: item.album.release_date,
+                trackCount: item.album.total_tracks,
+                artists: item.album.artists.map(artist => ({
+                    id: artist.id,
+                    name: artist.name,
+                })),
+                albumArts: item.album.images.map(image => ({
+                    url: image.url,
+                    width: image.width,
+                    height: image.height,
+                })),
+            },
         }));
     }
-    public async searchAlbum({ query, limit = 20, locale }: SearchInput): Promise<Album[]> {
+    protected async searchAlbum({ query, limit = 20, locale }: SearchInput): Promise<RawAlbum[]> {
         const { body } = await this.request("/v1/search", { q: query, type: ["album"], limit, locale });
         if (!body.albums) {
             throw new Error("Invalid response");
@@ -118,40 +135,42 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
             locale,
         });
 
-        return albums.map((item, index) => ({
-            uri: super.getId(item.id),
-            resolverName: this.getName(),
-            locale: locale || "default",
-            query,
-            index,
+        return albums.map<RawAlbum>(item => ({
+            id: item.id,
             title: item.name,
-            artists: item.artists.map(artist => artist.name),
+            releaseDate: item.release_date,
+            trackCount: item.total_tracks,
+            artists: item.artists.map(artist => ({
+                id: artist.id,
+                name: artist.name,
+            })),
             albumArts: item.images.map(image => ({
                 url: image.url,
                 width: image.width,
                 height: image.height,
             })),
-            releaseDate: item.release_date,
-            trackCount: item.total_tracks,
             tracks: item.tracks.items.map(track => ({
+                id: track.id,
                 title: track.name,
-                artists: track.artists.map(artist => artist.name),
                 track: track.track_number,
                 disc: track.disc_number,
                 duration: track.duration_ms,
-                album: item.name,
                 year: item.release_date,
-                albumArtists: item.artists.map(artist => artist.name),
+                artists: track.artists.map(artist => ({
+                    id: artist.id,
+                    name: artist.name,
+                })),
             })),
         }));
     }
-    public async searchArtist({ query, limit = 20, locale }: SearchInput): Promise<Artist[]> {
+    protected async searchArtist({ query, limit = 20, locale }: SearchInput): Promise<RawArtist[]> {
         const { body } = await this.request("/v1/search", { q: query, type: ["artist"], limit, locale });
         if (!body.artists) {
             throw new Error("Invalid response");
         }
 
         return body.artists.items.map(item => ({
+            id: item.id,
             name: item.name,
             artistImages: item.images.map(image => ({
                 url: image.url,

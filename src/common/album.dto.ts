@@ -1,3 +1,5 @@
+import { createIs } from "typia";
+
 import { Field, Int, ObjectType } from "@nestjs/graphql";
 
 import { MediaItem, RootMediaItem } from "@common/media-item.dto";
@@ -49,3 +51,8 @@ export class Album extends RootMediaItem {
 }
 
 export type RawAlbum = ToRawType<Album>;
+
+export const isAlbum = createIs<Album>();
+export const isAlbumArray = createIs<Album[]>();
+export const isRawAlbum = createIs<RawAlbum>();
+export const isRawAlbumArray = createIs<RawAlbum[]>();

@@ -1,3 +1,5 @@
+import { createIs } from "typia";
+
 import { Field, ObjectType } from "@nestjs/graphql";
 
 import { Image } from "@common/image.dto";
@@ -20,3 +22,8 @@ export class PartialArtist extends MediaItem {
 }
 
 export type RawArtist = ToRawType<Artist>;
+
+export const isArtist = createIs<Artist>();
+export const isArtistArray = createIs<Artist[]>();
+export const isRawArtist = createIs<RawArtist>();
+export const isRawArtistArray = createIs<RawArtist[]>();

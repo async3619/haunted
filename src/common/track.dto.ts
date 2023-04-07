@@ -1,3 +1,5 @@
+import { createIs } from "typia";
+
 import { Field, Int, ObjectType } from "@nestjs/graphql";
 
 import { MediaItem, RootMediaItem } from "@common/media-item.dto";
@@ -49,3 +51,8 @@ export class Track extends RootMediaItem {
 }
 
 export type RawTrack = ToRawType<Track>;
+
+export const isTrack = createIs<Track>();
+export const isTrackArray = createIs<Track[]>();
+export const isRawTrack = createIs<RawTrack>();
+export const isRawTrackArray = createIs<RawTrack[]>();

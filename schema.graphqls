@@ -20,27 +20,6 @@ type PartialArtist {
   name: String!
 }
 
-type AlbumTrack {
-  id: String!
-  title: String!
-  duration: Int!
-  track: Int!
-  disc: Int!
-  year: String!
-  artists: [PartialArtist!]!
-}
-
-type Album {
-  id: String!
-  serviceName: String!
-  title: String!
-  artists: [PartialArtist!]!
-  releaseDate: String!
-  trackCount: Int!
-  albumArts: [Image!]!
-  tracks: [AlbumTrack!]!
-}
-
 type TrackAlbum {
   id: String!
   title: String!
@@ -60,6 +39,27 @@ type Track {
   year: String!
   artists: [PartialArtist!]!
   album: TrackAlbum!
+}
+
+type AlbumTrack {
+  id: String!
+  title: String!
+  duration: Int!
+  track: Int!
+  disc: Int!
+  year: String!
+  artists: [PartialArtist!]!
+}
+
+type Album {
+  id: String!
+  serviceName: String!
+  title: String!
+  artists: [PartialArtist!]!
+  releaseDate: String!
+  trackCount: Int!
+  albumArts: [Image!]!
+  tracks: [AlbumTrack!]!
 }
 
 type Query {

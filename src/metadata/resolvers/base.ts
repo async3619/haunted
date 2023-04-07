@@ -1,9 +1,9 @@
 import _ from "lodash";
 
 import { SearchInput } from "@common/search-input.dto";
-import { RawTrack } from "@common/track.dto";
+import { isRawTrackArray, RawTrack } from "@common/track.dto";
 import { RawArtist } from "@common/artist.dto";
-import { RawAlbum } from "@common/album.dto";
+import { isRawAlbumArray, RawAlbum } from "@common/album.dto";
 import { MediaObjectMap, MediaType } from "@common/types";
 
 import { Loggable } from "@utils/loggable";
@@ -57,11 +57,39 @@ export default abstract class BaseResolver<
             }
         })();
 
-        return rawData.map(item => ({
+        let result = rawData.map(item => ({
             ...item,
             id: this.getId(item.id),
             serviceName: this.getServiceName(),
         }));
+
+        if (isRawAlbumArray(result)) {
+            result = result.map(album => ({
+                ...album,
+                artists: album.artists.map(artist => ({
+                    ...artist,
+                    id: this.getId(artist.id),
+                })),
+                tracks: album.tracks.map(track => ({
+                    ...track,
+                    id: this.getId(track.id),
+                })),
+            }));
+        } else if (isRawTrackArray(result)) {
+            result = result.map(track => ({
+                ...track,
+                artists: track.artists.map(artist => ({
+                    ...artist,
+                    id: this.getId(artist.id),
+                })),
+                album: {
+                    ...track.album,
+                    id: this.getId(track.album.id),
+                },
+            }));
+        }
+
+        return result;
     }
 
     public async getItems<Type extends MediaType>(

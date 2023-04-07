@@ -7,6 +7,15 @@ import { flushDiagnostics, formatDiagnostic, reportDiagnostic } from "./utils/di
 import { treeKillSync } from "./utils/process";
 import printLog from "./utils/printLog";
 
+function isSourceMapSupportPkgAvailable() {
+    try {
+        require.resolve("source-map-support");
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 function watchMain() {
     const configPath = tts.findConfigFile("./", ts.sys.fileExists, "tsconfig.build.json");
     if (!configPath) {
@@ -93,7 +102,12 @@ function spawnProcess() {
 
     outputFilePath = outputFilePath.indexOf(" ") >= 0 ? `"${outputFilePath}"` : outputFilePath;
 
-    return spawn("node", [outputFilePath, ...childProcessArgs], {
+    const register: string[] = [];
+    if (isSourceMapSupportPkgAvailable()) {
+        register.push("-r source-map-support/register");
+    }
+
+    return spawn("node", [...register, outputFilePath, ...childProcessArgs], {
         stdio: "inherit",
         shell: true,
         cwd: process.cwd(),

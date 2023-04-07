@@ -92,6 +92,15 @@ export default abstract class BaseResolver<
         return result;
     }
 
+    public async getItem<Type extends MediaType>(
+        id: string,
+        type: Type,
+        locale?: string,
+    ): Promise<MediaObjectMap[Type] | null> {
+        const items = await this.getItems([id], type, locale);
+
+        return items.length > 0 ? items[0] : null;
+    }
     public async getItems<Type extends MediaType>(
         ids: string[],
         type: Type,

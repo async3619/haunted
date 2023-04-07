@@ -2,7 +2,7 @@ import { NestExpressApplication } from "@nestjs/platform-express";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 
 import { initializeE2E } from "@test/utils/initializeE2E";
-import { expectContainPartially } from "@test/utils/expectContainPartially";
+import { expectContainPartially, expectContainPartiallyInArray } from "@test/utils/expect";
 
 import { Router } from "@root/router";
 
@@ -28,9 +28,37 @@ describe("Artist (e2e)", () => {
         await app.close();
     });
 
+    describe("artist (TRPC)", () => {
+        it("should be able to get artist", async () => {
+            expectContainPartially(
+                await client.artist.query({
+                    id: "spotify::02WoRfOhF5nUVpwddshInq",
+                }),
+                { name: "CHOILB" },
+            );
+        });
+
+        it("should respect locale", async () => {
+            expectContainPartially(
+                await client.artist.query({
+                    id: "spotify::02WoRfOhF5nUVpwddshInq",
+                }),
+                { name: "CHOILB" },
+            );
+
+            expectContainPartially(
+                await client.artist.query({
+                    id: "spotify::02WoRfOhF5nUVpwddshInq",
+                    locale: "ko_KR",
+                }),
+                { name: "최엘비" },
+            );
+        });
+    });
+
     describe("artists (TRPC)", () => {
         it("should be able to get artists", async () => {
-            expectContainPartially(
+            expectContainPartiallyInArray(
                 await client.artists.query({
                     ids: ["spotify::02WoRfOhF5nUVpwddshInq"],
                 }),
@@ -39,14 +67,14 @@ describe("Artist (e2e)", () => {
         });
 
         it("should respect locale", async () => {
-            expectContainPartially(
+            expectContainPartiallyInArray(
                 await client.artists.query({
                     ids: ["spotify::02WoRfOhF5nUVpwddshInq"],
                 }),
                 { name: "CHOILB" },
             );
 
-            expectContainPartially(
+            expectContainPartiallyInArray(
                 await client.artists.query({
                     ids: ["spotify::02WoRfOhF5nUVpwddshInq"],
                     locale: "ko_KR",
@@ -58,7 +86,7 @@ describe("Artist (e2e)", () => {
 
     describe("searchArtists (TRPC)", () => {
         it("should be able to search artists", async () => {
-            expectContainPartially(
+            expectContainPartiallyInArray(
                 await client.searchArtists.query({
                     query: "최엘비",
                     limit: 1,
@@ -77,7 +105,7 @@ describe("Artist (e2e)", () => {
         });
 
         it("should respect locale", async () => {
-            expectContainPartially(
+            expectContainPartiallyInArray(
                 await client.searchArtists.query({
                     query: "최엘비",
                     limit: 1,
@@ -85,7 +113,7 @@ describe("Artist (e2e)", () => {
                 { name: "CHOILB" },
             );
 
-            expectContainPartially(
+            expectContainPartiallyInArray(
                 await client.searchArtists.query({
                     query: "최엘비",
                     locale: "ko_KR",

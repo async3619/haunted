@@ -14,11 +14,22 @@ import { InjectConfig } from "@config/config.decorator";
 
 import { SearchInput } from "@common/search-input.dto";
 import { GetItemsInput } from "@common/get-items-input.dto";
+import { GetItemInput } from "@common/get-item-input.dto";
 
 @Injectable()
 export class TRPCServerService {
     private readonly t = initTRPC.create();
     private readonly appRouter = this.t.router({
+        track: this.t.procedure.input(createAssert<GetItemInput>()).query(({ input }) => {
+            return this.trackService.getItem(input.id, input.locale);
+        }),
+        album: this.t.procedure.input(createAssert<GetItemInput>()).query(({ input }) => {
+            return this.albumService.getItem(input.id, input.locale);
+        }),
+        artist: this.t.procedure.input(createAssert<GetItemInput>()).query(({ input }) => {
+            return this.artistService.getItem(input.id, input.locale);
+        }),
+
         tracks: this.t.procedure.input(createAssert<GetItemsInput>()).query(({ input }) => {
             return this.trackService.getItems(input.ids, input.locale);
         }),

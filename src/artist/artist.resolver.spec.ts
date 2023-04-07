@@ -48,4 +48,14 @@ describe("ArtistResolver", () => {
         expect(mockedResolver.getArtists).toBeCalledTimes(1);
         expect(mockedResolver.getArtists).toBeCalledWith(["1", "2", "3"], "en");
     });
+
+    it("should be able to get item", async () => {
+        await resolver.artist({
+            id: "mocked::1",
+            locale: "en",
+        });
+
+        expect(mockedResolver.getArtists).toBeCalledTimes(1);
+        expect(mockedResolver.getArtists).toBeCalledWith(["1"], "en");
+    });
 });

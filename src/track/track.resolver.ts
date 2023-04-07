@@ -5,11 +5,19 @@ import { TrackService } from "@track/track.service";
 
 import { SearchInput } from "@common/search-input.dto";
 import { GetItemsInput } from "@common/get-items-input.dto";
+import { GetItemInput } from "@common/get-item-input.dto";
 import { Track } from "@common/track.dto";
 
 @Resolver()
 export class TrackResolver {
     public constructor(@Inject(TrackService) private readonly trackService: TrackService) {}
+
+    @Query(() => Track, { nullable: true })
+    public async track(
+        @Args("input", { type: () => GetItemInput }) { locale, id }: GetItemInput,
+    ): Promise<Track | null> {
+        return this.trackService.getItem(id, locale);
+    }
 
     @Query(() => [Track])
     public async tracks(

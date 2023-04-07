@@ -69,6 +69,26 @@ export class ObjectService<TItem extends MediaObject, TMediaType extends MediaTy
         return results;
     }
 
+    public async getItem(id: string, locale?: string) {
+        if (this.itemCache.has({ id, locale })) {
+            return this.itemCache.getOrThrow({ id, locale });
+        }
+
+        for (const [, resolver] of this.metadata.getResolvers()) {
+            const rawId = resolver.getRawId(id);
+            if (!rawId) {
+                continue;
+            }
+
+            const item = await resolver.getItem(rawId, this.type, locale);
+            if (item) {
+                this.itemCache.set({ id, locale }, item);
+                return item;
+            }
+        }
+
+        return null;
+    }
     public async getItems(inputIds: string[], locale?: string) {
         const ids = inputIds.map(id => ({ id, locale }));
         const results: MediaObjectMap[TMediaType][] = [];

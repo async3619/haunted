@@ -3,11 +3,12 @@ import { PartialDeep } from "type-fest";
 
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { initializeE2E } from "@test/utils/initializeE2E";
+import { expectContainPartially, expectContainPartiallyInArray } from "@test/utils/expect";
 
 import { SearchInput } from "@common/search-input.dto";
 import { Album } from "@common/album.dto";
 import { GetItemsInput } from "@common/get-items-input.dto";
-import { expectContainPartially } from "@test/utils/expectContainPartially";
+import { GetItemInput } from "@common/get-item-input.dto";
 
 const searchAlbumsQuery = gql<{ searchAlbums: PartialDeep<Album> }, { input: SearchInput }>`
     query ($input: SearchInput!) {
@@ -24,6 +25,18 @@ const searchAlbumsQuery = gql<{ searchAlbums: PartialDeep<Album> }, { input: Sea
 const albumsQuery = gql<{ albums: PartialDeep<Album>[] }, { input: GetItemsInput }>`
     query ($input: GetItemsInput!) {
         albums(input: $input) {
+            id
+            title
+            artists {
+                id
+                name
+            }
+        }
+    }
+`;
+const albumQuery = gql<{ album: PartialDeep<Album> }, { input: GetItemInput }>`
+    query ($input: GetItemInput!) {
+        album(input: $input) {
             id
             title
             artists {
@@ -55,13 +68,39 @@ describe("Album (e2e)", () => {
         await app.close();
     });
 
+    describe("album (GraphQL)", () => {
+        it("should be able to get album", async () => {
+            const { data } = await client
+                .query(albumQuery, { input: { id: "spotify::5DxGRsBdRlbyWoEWvrYQ5P" } })
+                .toPromise();
+
+            expectContainPartially(data?.album, {
+                id: "spotify::5DxGRsBdRlbyWoEWvrYQ5P",
+                title: "angel",
+            });
+        });
+
+        it("should respect locale", async () => {
+            const { data: en } = await client
+                .query(albumQuery, { input: { id: "spotify::5KyAvL3uY3CsyNXPjKmDyU" } })
+                .toPromise();
+
+            const { data: ko } = await client
+                .query(albumQuery, { input: { id: "spotify::5KyAvL3uY3CsyNXPjKmDyU", locale: "ko_KR" } })
+                .toPromise();
+
+            expect(en?.album.title).toBe("Independent Music");
+            expect(ko?.album.title).toBe("독립음악");
+        });
+    });
+
     describe("albums (GraphQL)", () => {
         it("should be able to get albums", async () => {
             const { data } = await client
                 .query(albumsQuery, { input: { ids: ["spotify::5DxGRsBdRlbyWoEWvrYQ5P"] } })
                 .toPromise();
 
-            expectContainPartially(data?.albums, {
+            expectContainPartiallyInArray(data?.albums, {
                 id: "spotify::5DxGRsBdRlbyWoEWvrYQ5P",
                 title: "angel",
             });

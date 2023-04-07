@@ -48,4 +48,14 @@ describe("AlbumResolver", () => {
         expect(mockedResolver.getAlbums).toBeCalledTimes(1);
         expect(mockedResolver.getAlbums).toBeCalledWith(["1", "2", "3"], "en");
     });
+
+    it("should be able to get item", async () => {
+        await resolver.album({
+            id: "mocked::1",
+            locale: "en",
+        });
+
+        expect(mockedResolver.getAlbums).toBeCalledTimes(1);
+        expect(mockedResolver.getAlbums).toBeCalledWith(["1"], "en");
+    });
 });

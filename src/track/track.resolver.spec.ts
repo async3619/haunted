@@ -48,4 +48,14 @@ describe("TrackResolver", () => {
         expect(mockedResolver.getTracks).toBeCalledTimes(1);
         expect(mockedResolver.getTracks).toBeCalledWith(["1", "2", "3"], "en");
     });
+
+    it("should be able to get item", async () => {
+        await resolver.track({
+            id: "mocked::1",
+            locale: "en",
+        });
+
+        expect(mockedResolver.getTracks).toBeCalledTimes(1);
+        expect(mockedResolver.getTracks).toBeCalledWith(["1"], "en");
+    });
 });

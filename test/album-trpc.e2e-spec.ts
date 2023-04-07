@@ -2,7 +2,7 @@ import { NestExpressApplication } from "@nestjs/platform-express";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 
 import { initializeE2E } from "@test/utils/initializeE2E";
-import { expectContainPartially } from "@test/utils/expectContainPartially";
+import { expectContainPartially } from "@test/utils/expect";
 
 import { Router } from "@root/router";
 

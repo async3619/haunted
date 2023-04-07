@@ -2,7 +2,7 @@ import { NestExpressApplication } from "@nestjs/platform-express";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 
 import { initializeE2E } from "@test/utils/initializeE2E";
-import { expectContainPartially } from "@test/utils/expectContainPartially";
+import { expectContainPartially, expectContainPartiallyInArray } from "@test/utils/expect";
 
 import { Router } from "@root/router";
 
@@ -28,9 +28,46 @@ describe("Track (e2e)", () => {
         await app.close();
     });
 
+    describe("track (TRPC)", () => {
+        it("should be able to get track", async () => {
+            expectContainPartially(
+                await client.track.query({
+                    id: "spotify::7Jin5db4i7evTFvtGU1Am1",
+                }),
+                {
+                    title: "Independent Music",
+                    artists: [expect.objectContaining({ name: "CHOILB" })],
+                },
+            );
+        });
+
+        it("should respect locale", async () => {
+            expectContainPartially(
+                await client.track.query({
+                    id: "spotify::7Jin5db4i7evTFvtGU1Am1",
+                }),
+                {
+                    title: "Independent Music",
+                    artists: [expect.objectContaining({ name: "CHOILB" })],
+                },
+            );
+
+            expectContainPartially(
+                await client.track.query({
+                    id: "spotify::7Jin5db4i7evTFvtGU1Am1",
+                    locale: "ko_KR",
+                }),
+                {
+                    title: "독립음악",
+                    artists: [expect.objectContaining({ name: "최엘비" })],
+                },
+            );
+        });
+    });
+
     describe("tracks (TRPC)", () => {
         it("should be able to get tracks", async () => {
-            expectContainPartially(
+            expectContainPartiallyInArray(
                 await client.tracks.query({
                     ids: ["spotify::7Jin5db4i7evTFvtGU1Am1"],
                 }),
@@ -42,7 +79,7 @@ describe("Track (e2e)", () => {
         });
 
         it("should respect locale", async () => {
-            expectContainPartially(
+            expectContainPartiallyInArray(
                 await client.tracks.query({
                     ids: ["spotify::7Jin5db4i7evTFvtGU1Am1"],
                 }),
@@ -52,7 +89,7 @@ describe("Track (e2e)", () => {
                 },
             );
 
-            expectContainPartially(
+            expectContainPartiallyInArray(
                 await client.tracks.query({
                     ids: ["spotify::7Jin5db4i7evTFvtGU1Am1"],
                     locale: "ko_KR",
@@ -67,7 +104,7 @@ describe("Track (e2e)", () => {
 
     describe("searchTracks (TRPC)", () => {
         it("should be able to search tracks", async () => {
-            expectContainPartially(
+            expectContainPartiallyInArray(
                 await client.searchTracks.query({
                     query: "최엘비 독립음악",
                     limit: 1,
@@ -89,7 +126,7 @@ describe("Track (e2e)", () => {
         });
 
         it("should respect locale", async () => {
-            expectContainPartially(
+            expectContainPartiallyInArray(
                 await client.searchTracks.query({
                     query: "독립음악",
                     limit: 1,
@@ -100,7 +137,7 @@ describe("Track (e2e)", () => {
                 },
             );
 
-            expectContainPartially(
+            expectContainPartiallyInArray(
                 await client.searchTracks.query({
                     query: "독립음악",
                     locale: "ko_KR",

@@ -21,6 +21,7 @@ const jestConfig: JestConfigWithTsJest = {
         "!**/node_modules/**",
         "!src/main.ts",
         "!src/**/*.spec.ts",
+        "!src/router.ts",
     ],
     coverageDirectory: "./coverage-e2e",
     roots: ["<rootDir>"],

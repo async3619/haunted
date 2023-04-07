@@ -24,6 +24,40 @@ describe("Cache", () => {
         expect(cache.get("test2")).toBe(2);
     });
 
+    it("should be able to set and get multiple values", () => {
+        const cache = new CacheStorage<string, number>();
+        cache.setMany([
+            ["test", 1],
+            ["test2", 2],
+        ]);
+
+        expect(cache.length).toBe(2);
+        expect(cache.getMany(["test", "test2"])).toEqual([1, 2]);
+    });
+
+    it("should be able to get multiple values with nulls", () => {
+        const cache = new CacheStorage<string, number>();
+        cache.setMany([
+            ["test", 1],
+            ["test2", 2],
+        ]);
+
+        expect(cache.length).toBe(2);
+        expect(cache.getMany(["test", "test3"])).toEqual([1, null]);
+    });
+
+    it("should throw error if given key is not found", () => {
+        const cache = new CacheStorage<string, number>();
+        cache.set("test", 1);
+        cache.set("test2", 2);
+
+        expect(() => cache.getOrThrow("test")).not.toThrow();
+        expect(() => cache.getManyOrThrow(["test", "test2"])).not.toThrow();
+
+        expect(() => cache.getOrThrow("test3")).toThrow();
+        expect(() => cache.getManyOrThrow(["test3", "test"])).toThrow();
+    });
+
     it("should be able to determine if item is alive", () => {
         const cache = new CacheStorage<string, number>();
         cache.set("test", 1);

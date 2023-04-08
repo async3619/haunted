@@ -77,8 +77,16 @@ describe("Album (e2e)", () => {
         it("should be able to get albums of artist", async () => {
             const data = await client.artistAlbums.query({ artistId: "spotify::6a8cUmqOsXmjzq1aWKiVpH" });
 
-            expect(data.total).toStrictEqual(expect.any(Number));
-            expect(data.items.some(item => item.title === "The Anecdote")).toBe(true);
+            expect(data?.total).toStrictEqual(expect.any(Number));
+            expect(data?.items.some(item => item.title === "The Anecdote")).toBe(true);
+        });
+
+        it("should be able to return null if artist is not found", async () => {
+            expect(
+                await client.artistAlbums.query({
+                    artistId: "spotify::test",
+                }),
+            ).toBeNull();
         });
 
         it("should respect offset and limit", async () => {
@@ -93,8 +101,8 @@ describe("Album (e2e)", () => {
                 limit: 1,
             });
 
-            expect(data.items).toHaveLength(1);
-            expect(withoutOffset.items).toHaveLength(1);
+            expect(data?.items).toHaveLength(1);
+            expect(withoutOffset?.items).toHaveLength(1);
             expect(data).not.toStrictEqual(withoutOffset);
         });
 
@@ -108,8 +116,8 @@ describe("Album (e2e)", () => {
                 locale: "ko_KR",
             });
 
-            expect(en.items[0].title).toBe("Independent Music");
-            expect(kr.items[0].title).toBe("독립음악");
+            expect(en?.items[0].title).toBe("Independent Music");
+            expect(kr?.items[0].title).toBe("독립음악");
         });
     });
 

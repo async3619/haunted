@@ -123,6 +123,12 @@ describe("Album (e2e)", () => {
             expect(data?.artistAlbums.items?.some(item => item.title === "The Anecdote")).toBe(true);
         });
 
+        it("should be able to return null if artist is not found", async () => {
+            const { data } = await client.query(artistAlbumsQuery, { artistId: "spotify::test" }).toPromise();
+
+            expect(data?.artistAlbums).toBeNull();
+        });
+
         it("should respect offset and limit", async () => {
             const { data } = await client
                 .query(artistAlbumsQuery, { artistId: "spotify::6a8cUmqOsXmjzq1aWKiVpH", offset: 1, limit: 1 })

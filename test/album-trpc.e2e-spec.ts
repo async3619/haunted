@@ -73,6 +73,46 @@ describe("Album (e2e)", () => {
         });
     });
 
+    describe("artistAlbums (TRPC)", () => {
+        it("should be able to get albums of artist", async () => {
+            const data = await client.artistAlbums.query({ artistId: "spotify::6a8cUmqOsXmjzq1aWKiVpH" });
+
+            expect(data.total).toStrictEqual(expect.any(Number));
+            expect(data.items.some(item => item.title === "The Anecdote")).toBe(true);
+        });
+
+        it("should respect offset and limit", async () => {
+            const data = await client.artistAlbums.query({
+                artistId: "spotify::6a8cUmqOsXmjzq1aWKiVpH",
+                offset: 1,
+                limit: 1,
+            });
+
+            const withoutOffset = await client.artistAlbums.query({
+                artistId: "spotify::6a8cUmqOsXmjzq1aWKiVpH",
+                limit: 1,
+            });
+
+            expect(data.items).toHaveLength(1);
+            expect(withoutOffset.items).toHaveLength(1);
+            expect(data).not.toStrictEqual(withoutOffset);
+        });
+
+        it("should respect locale", async () => {
+            const en = await client.artistAlbums.query({
+                artistId: "spotify::02WoRfOhF5nUVpwddshInq",
+            });
+
+            const kr = await client.artistAlbums.query({
+                artistId: "spotify::02WoRfOhF5nUVpwddshInq",
+                locale: "ko_KR",
+            });
+
+            expect(en.items[0].title).toBe("Independent Music");
+            expect(kr.items[0].title).toBe("독립음악");
+        });
+    });
+
     describe("albums (TRPC)", () => {
         it("should be able to get albums", async () => {
             expectContainPartiallyInArray(

@@ -1,11 +1,14 @@
 import { is } from "typia";
 import SpotifyWebApi from "spotify-web-api-node";
 
-import { SearchInput } from "@common/search-input.dto";
-
 import BaseResolver from "@metadata/resolvers/base";
 
+import { isRawAlbum } from "@common/album.dto";
+import { RawArtistAlbums } from "@common/artist-albums.dto";
+import { SearchInput } from "@common/search-input.dto";
+
 import { JsonResponse, Request } from "@utils/request";
+import { Nullable } from "@utils/types";
 
 export interface SpotifyResolverOptions {
     clientId: string;
@@ -31,6 +34,12 @@ interface ApiParameters {
     "/v1/albums": (params: { ids: string[]; locale?: string }) => SpotifyApi.MultipleAlbumsResponse;
     "/v1/artists": (params: { ids: string[]; locale?: string }) => SpotifyApi.MultipleArtistsResponse;
     "/v1/tracks": (params: { ids: string[]; locale?: string }) => SpotifyApi.MultipleTracksResponse;
+    "/v1/artists/{id}/albums": (params: {
+        id: string;
+        limit?: number;
+        offset?: number;
+        locale?: string;
+    }) => SpotifyApi.ArtistsAlbumsResponse;
 }
 
 export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOptions> {
@@ -57,12 +66,29 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
         path: TPath,
         query?: Parameters<ApiParameters[TPath]>[0],
     ): Promise<JsonResponse<ReturnType<ApiParameters[TPath]>>> {
+        let targetPath: string = path;
+
+        // replace path parameters is appeared in path like "{name}" with query parameters
+        const pathParams = targetPath.match(/{\w+}/g);
+        if (pathParams && query) {
+            for (const param of pathParams) {
+                const paramName = param.replace(/[{}]/g, "");
+                const paramValue = query[paramName];
+                if (!paramValue) {
+                    throw new Error(`Missing path parameter: ${paramName}`);
+                }
+
+                targetPath = targetPath.replace(param, paramValue);
+                delete query[paramName];
+            }
+        }
+
         let request = Request.create()
             .withScheme("https")
             .withHost("api.spotify.com")
             .withPort(443)
             .withAuth(this.client.getAccessToken())
-            .withPath(path);
+            .withPath(targetPath);
 
         if (query) {
             request = request.withQuery(query);
@@ -85,6 +111,36 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
             body,
             headers,
             statusCode,
+        };
+    }
+
+    protected async fetchArtistAlbums(
+        artistId: string,
+        offset?: number,
+        limit?: number,
+        locale?: string,
+    ): Promise<Nullable<RawArtistAlbums>> {
+        const albumIds: string[] = [];
+        let total = 0;
+
+        try {
+            const { body } = await this.request("/v1/artists/{id}/albums", { id: artistId, offset, limit, locale });
+            albumIds.push(...body.items.map(item => item.id));
+
+            total = body.total;
+        } catch (e) {
+            return null;
+        }
+
+        const albums = await this.getAlbums(albumIds, locale);
+        const validAlbums = albums.filter(isRawAlbum);
+        if (validAlbums.length !== albumIds.length) {
+            throw new Error("Failed to fetch artist albums");
+        }
+
+        return {
+            total,
+            items: validAlbums,
         };
     }
 

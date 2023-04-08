@@ -15,11 +15,18 @@ import { InjectConfig } from "@config/config.decorator";
 import { SearchInput } from "@common/search-input.dto";
 import { GetItemsInput } from "@common/get-items-input.dto";
 import { GetItemInput } from "@common/get-item-input.dto";
+import { RootArtistAlbumsInput } from "@common/artist-albums-input.dto";
 
 @Injectable()
 export class TRPCServerService {
     private readonly t = initTRPC.create();
     private readonly appRouter = this.t.router({
+        artistAlbums: this.t.procedure
+            .input(createAssert<RootArtistAlbumsInput>())
+            .query(({ input: { artistId, locale, limit, offset } }) => {
+                return this.artistService.getArtistAlbums(artistId, offset, limit, locale);
+            }),
+
         track: this.t.procedure.input(createAssert<GetItemInput>()).query(({ input }) => {
             return this.trackService.getItem(input.id, input.locale);
         }),

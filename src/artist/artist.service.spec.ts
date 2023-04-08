@@ -37,4 +37,19 @@ describe("ArtistService", () => {
             limit: 10,
         });
     });
+
+    it("should be able to get albums of artist", async () => {
+        await expect(service.getArtistAlbums("mocked::test")).resolves.not.toThrow();
+    });
+
+    it("should return cached results for resolving albums of artist if they are available", async () => {
+        const left = await service.getArtistAlbums("mocked::test");
+        const right = await service.getArtistAlbums("mocked::test");
+
+        expect(left === right).toBe(true);
+    });
+
+    it("should throw an error if there is no resolver for the given id", async () => {
+        await expect(service.getArtistAlbums("test")).rejects.toThrow();
+    });
 });

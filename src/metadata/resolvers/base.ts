@@ -8,6 +8,7 @@ import { MediaObjectMap, MediaType } from "@common/types";
 
 import { Loggable } from "@utils/loggable";
 import { Nullable } from "@utils/types";
+import { ArtistAlbums, RawArtistAlbums } from "@common/artist-albums.dto";
 
 export default abstract class BaseResolver<
     TType extends string,
@@ -133,6 +134,44 @@ export default abstract class BaseResolver<
                 : null,
         );
     }
+
+    public async getArtistAlbums(
+        artistId: string,
+        offset?: number,
+        limit?: number,
+        locale?: string,
+    ): Promise<Nullable<ArtistAlbums>> {
+        const result = await this.fetchArtistAlbums(artistId, offset, limit, locale);
+        if (!result) {
+            return null;
+        }
+
+        const { total, items } = result;
+
+        return {
+            total,
+            items: items.map(item => ({
+                ...item,
+                id: this.getId(item.id),
+                serviceName: this.getName(),
+                artists: item.artists.map(artist => ({
+                    ...artist,
+                    id: this.getId(artist.id),
+                })),
+                tracks: item.tracks.map(track => ({
+                    ...track,
+                    id: this.getId(track.id),
+                })),
+            })),
+        };
+    }
+
+    protected abstract fetchArtistAlbums(
+        artistId: string,
+        offset?: number,
+        limit?: number,
+        locale?: string,
+    ): Promise<Nullable<RawArtistAlbums>>;
 
     protected abstract getTracks(ids: string[], locale?: string): Promise<Nullable<RawTrack>[]>;
     protected abstract getAlbums(ids: string[], locale?: string): Promise<Nullable<RawAlbum>[]>;

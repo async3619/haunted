@@ -5,10 +5,12 @@ import { NestExpressApplication } from "@nestjs/platform-express";
 import { initializeE2E } from "@test/utils/initializeE2E";
 import { expectContainPartially, expectContainPartiallyInArray } from "@test/utils/expect";
 
-import { SearchInput } from "@common/search-input.dto";
 import { Album } from "@common/album.dto";
+import { ArtistAlbums } from "@common/artist-albums.dto";
+import { SearchInput } from "@common/search-input.dto";
 import { GetItemsInput } from "@common/get-items-input.dto";
 import { GetItemInput } from "@common/get-item-input.dto";
+import { RootArtistAlbumsInput } from "@common/artist-albums-input.dto";
 
 const searchAlbumsQuery = gql<{ searchAlbums: PartialDeep<Album> }, { input: SearchInput }>`
     query ($input: SearchInput!) {
@@ -42,6 +44,17 @@ const albumQuery = gql<{ album: PartialDeep<Album> }, { input: GetItemInput }>`
             artists {
                 id
                 name
+            }
+        }
+    }
+`;
+const artistAlbumsQuery = gql<{ artistAlbums: PartialDeep<ArtistAlbums> }, RootArtistAlbumsInput>`
+    query ($offset: Int, $limit: Int, $locale: String, $artistId: String!) {
+        artistAlbums(artistId: $artistId, offset: $offset, limit: $limit, locale: $locale) {
+            total
+            items {
+                id
+                title
             }
         }
     }
@@ -97,6 +110,44 @@ describe("Album (e2e)", () => {
 
             expect(en?.album.title).toBe("Independent Music");
             expect(ko?.album.title).toBe("독립음악");
+        });
+    });
+
+    describe("artistAlbums (GraphQL)", () => {
+        it("should be able to get albums of artist", async () => {
+            const { data } = await client
+                .query(artistAlbumsQuery, { artistId: "spotify::6a8cUmqOsXmjzq1aWKiVpH" })
+                .toPromise();
+
+            expect(data?.artistAlbums.total).toStrictEqual(expect.any(Number));
+            expect(data?.artistAlbums.items?.some(item => item.title === "The Anecdote")).toBe(true);
+        });
+
+        it("should respect offset and limit", async () => {
+            const { data } = await client
+                .query(artistAlbumsQuery, { artistId: "spotify::6a8cUmqOsXmjzq1aWKiVpH", offset: 1, limit: 1 })
+                .toPromise();
+
+            const { data: withoutOffset } = await client
+                .query(artistAlbumsQuery, { artistId: "spotify::6a8cUmqOsXmjzq1aWKiVpH", limit: 1 })
+                .toPromise();
+
+            expect(data?.artistAlbums.items).toHaveLength(1);
+            expect(withoutOffset?.artistAlbums.items).toHaveLength(1);
+            expect(data?.artistAlbums).not.toStrictEqual(withoutOffset?.artistAlbums);
+        });
+
+        it("should respect locale", async () => {
+            const { data: en } = await client
+                .query(artistAlbumsQuery, { artistId: "spotify::02WoRfOhF5nUVpwddshInq" })
+                .toPromise();
+
+            const { data: ko } = await client
+                .query(artistAlbumsQuery, { artistId: "spotify::02WoRfOhF5nUVpwddshInq", locale: "ko_KR" })
+                .toPromise();
+
+            expect(en?.artistAlbums.items?.[0].title).toBe("Independent Music");
+            expect(ko?.artistAlbums.items?.[0].title).toBe("독립음악");
         });
     });
 

@@ -13,6 +13,7 @@ type Artist {
   serviceName: String!
   name: String!
   artistImages: [Image!]!
+  albums(offset: Int, limit: Int, locale: String): ArtistAlbums!
 }
 
 type PartialArtist {
@@ -62,11 +63,17 @@ type Album {
   tracks: [AlbumTrack!]!
 }
 
+type ArtistAlbums {
+  total: Int!
+  items: [Album!]!
+}
+
 type Query {
   track(input: GetItemInput!): Track
   tracks(input: GetItemsInput!): [Track]!
   searchTracks(input: SearchInput!): [Track!]!
   album(input: GetItemInput!): Album
+  artistAlbums(offset: Int, limit: Int, locale: String, artistId: String!): ArtistAlbums
   albums(input: GetItemsInput!): [Album]!
   searchAlbums(input: SearchInput!): [Album!]!
   artist(input: GetItemInput!): Artist

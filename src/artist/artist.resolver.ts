@@ -17,21 +17,17 @@ export class ArtistResolver {
     public constructor(@Inject(ArtistService) private readonly artistService: ArtistService) {}
 
     @Query(() => Artist, { nullable: true })
-    public async artist(
-        @Args("input", { type: () => GetItemInput }) { locale, id }: GetItemInput,
-    ): Promise<Nullable<Artist>> {
+    public async artist(@Args() { locale, id }: GetItemInput): Promise<Nullable<Artist>> {
         return this.artistService.getItem(id, locale);
     }
 
     @Query(() => [Artist], { nullable: "items" })
-    public async artists(
-        @Args("input", { type: () => GetItemsInput }) { locale, ids }: GetItemsInput,
-    ): Promise<Nullable<Artist>[]> {
+    public async artists(@Args() { locale, ids }: GetItemsInput): Promise<Nullable<Artist>[]> {
         return this.artistService.getItems(ids, locale);
     }
 
     @Query(() => [Artist])
-    public async searchArtists(@Args("input", { type: () => SearchInput }) input: SearchInput): Promise<Artist[]> {
+    public async searchArtists(@Args() input: SearchInput): Promise<Artist[]> {
         return this.artistService.search(input);
     }
 

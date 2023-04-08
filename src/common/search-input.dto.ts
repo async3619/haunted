@@ -1,8 +1,8 @@
 import { IsOptional, Max, Min } from "class-validator";
 
-import { Field, InputType, Int } from "@nestjs/graphql";
+import { Field, ArgsType, Int } from "@nestjs/graphql";
 
-@InputType()
+@ArgsType()
 export class SearchInput {
     @Field(() => String)
     public query!: string;

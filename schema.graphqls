@@ -69,30 +69,14 @@ type ArtistAlbums {
 }
 
 type Query {
-  track(input: GetItemInput!): Track
-  tracks(input: GetItemsInput!): [Track]!
-  searchTracks(input: SearchInput!): [Track!]!
-  album(input: GetItemInput!): Album
+  track(id: String!, locale: String): Track
+  tracks(ids: [String!]!, locale: String): [Track]!
+  searchTracks(query: String!, limit: Int, locale: String): [Track!]!
+  album(id: String!, locale: String): Album
   artistAlbums(offset: Int, limit: Int, locale: String, artistId: String!): ArtistAlbums
-  albums(input: GetItemsInput!): [Album]!
-  searchAlbums(input: SearchInput!): [Album!]!
-  artist(input: GetItemInput!): Artist
-  artists(input: GetItemsInput!): [Artist]!
-  searchArtists(input: SearchInput!): [Artist!]!
-}
-
-input GetItemInput {
-  id: String!
-  locale: String
-}
-
-input GetItemsInput {
-  ids: [String!]!
-  locale: String
-}
-
-input SearchInput {
-  query: String!
-  limit: Int
-  locale: String
+  albums(ids: [String!]!, locale: String): [Album]!
+  searchAlbums(query: String!, limit: Int, locale: String): [Album!]!
+  artist(id: String!, locale: String): Artist
+  artists(ids: [String!]!, locale: String): [Artist]!
+  searchArtists(query: String!, limit: Int, locale: String): [Artist!]!
 }

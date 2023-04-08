@@ -10,9 +10,9 @@ import { SearchInput } from "@common/search-input.dto";
 import { GetItemsInput } from "@common/get-items-input.dto";
 import { GetItemInput } from "@root/common/get-item-input.dto";
 
-const searchTracksQuery = gql<{ searchTracks: PartialDeep<Track> }, { input: SearchInput }>`
-    query ($input: SearchInput!) {
-        searchTracks(input: $input) {
+const searchTracksQuery = gql<{ searchTracks: PartialDeep<Track> }, SearchInput>`
+    query ($query: String!, $limit: Int, $locale: String) {
+        searchTracks(query: $query, limit: $limit, locale: $locale) {
             id
             title
             artists {
@@ -22,9 +22,9 @@ const searchTracksQuery = gql<{ searchTracks: PartialDeep<Track> }, { input: Sea
         }
     }
 `;
-const tracksQuery = gql<{ tracks: PartialDeep<Track>[] }, { input: GetItemsInput }>`
-    query ($input: GetItemsInput!) {
-        tracks(input: $input) {
+const tracksQuery = gql<{ tracks: PartialDeep<Track>[] }, GetItemsInput>`
+    query ($ids: [String!]!, $locale: String) {
+        tracks(ids: $ids, locale: $locale) {
             id
             title
             artists {
@@ -34,9 +34,9 @@ const tracksQuery = gql<{ tracks: PartialDeep<Track>[] }, { input: GetItemsInput
         }
     }
 `;
-const trackQuery = gql<{ track: PartialDeep<Track> }, { input: GetItemInput }>`
-    query ($input: GetItemInput!) {
-        track(input: $input) {
+const trackQuery = gql<{ track: PartialDeep<Track> }, GetItemInput>`
+    query ($id: String!, $locale: String) {
+        track(id: $id, locale: $locale) {
             id
             title
             artists {
@@ -70,9 +70,7 @@ describe("Track (e2e)", () => {
 
     describe("track (GraphQL)", () => {
         it("should be able to get track", async () => {
-            const { data } = await client
-                .query(trackQuery, { input: { id: "spotify::7Jin5db4i7evTFvtGU1Am1" } })
-                .toPromise();
+            const { data } = await client.query(trackQuery, { id: "spotify::7Jin5db4i7evTFvtGU1Am1" }).toPromise();
 
             expectContainPartially(data?.track, {
                 id: "spotify::7Jin5db4i7evTFvtGU1Am1",
@@ -81,18 +79,16 @@ describe("Track (e2e)", () => {
         });
 
         it("should be able to return null if track is not found", async () => {
-            const { data } = await client.query(trackQuery, { input: { id: "spotify::test" } }).toPromise();
+            const { data } = await client.query(trackQuery, { id: "spotify::test" }).toPromise();
 
             expect(data?.track).toBeNull();
         });
 
         it("should respect locale", async () => {
-            const result_en = await client
-                .query(trackQuery, { input: { id: "spotify::7Jin5db4i7evTFvtGU1Am1" } })
-                .toPromise();
+            const result_en = await client.query(trackQuery, { id: "spotify::7Jin5db4i7evTFvtGU1Am1" }).toPromise();
 
             const result_ko = await client
-                .query(trackQuery, { input: { id: "spotify::7Jin5db4i7evTFvtGU1Am1", locale: "ko" } })
+                .query(trackQuery, { id: "spotify::7Jin5db4i7evTFvtGU1Am1", locale: "ko" })
                 .toPromise();
 
             expect(result_en.data?.track.title).toBe("Independent Music");
@@ -102,9 +98,7 @@ describe("Track (e2e)", () => {
 
     describe("tracks (GraphQL)", () => {
         it("should be able to get tracks", async () => {
-            const { data } = await client
-                .query(tracksQuery, { input: { ids: ["spotify::7Jin5db4i7evTFvtGU1Am1"] } })
-                .toPromise();
+            const { data } = await client.query(tracksQuery, { ids: ["spotify::7Jin5db4i7evTFvtGU1Am1"] }).toPromise();
 
             expectContainPartiallyInArray(data?.tracks, {
                 id: "spotify::7Jin5db4i7evTFvtGU1Am1",
@@ -113,18 +107,16 @@ describe("Track (e2e)", () => {
         });
 
         it("should be able to return null if track is not found", async () => {
-            const { data } = await client.query(tracksQuery, { input: { ids: ["spotify::test"] } }).toPromise();
+            const { data } = await client.query(tracksQuery, { ids: ["spotify::test"] }).toPromise();
 
             expect(data?.tracks).toEqual([null]);
         });
 
         it("should respect locale", async () => {
-            const result_en = await client
-                .query(tracksQuery, { input: { ids: ["spotify::7Jin5db4i7evTFvtGU1Am1"] } })
-                .toPromise();
+            const result_en = await client.query(tracksQuery, { ids: ["spotify::7Jin5db4i7evTFvtGU1Am1"] }).toPromise();
 
             const result_ko = await client
-                .query(tracksQuery, { input: { ids: ["spotify::7Jin5db4i7evTFvtGU1Am1"], locale: "ko" } })
+                .query(tracksQuery, { ids: ["spotify::7Jin5db4i7evTFvtGU1Am1"], locale: "ko" })
                 .toPromise();
 
             expect(result_en.data?.tracks[0].title).toBe("Independent Music");
@@ -135,7 +127,7 @@ describe("Track (e2e)", () => {
     describe("searchTracks (GraphQL)", () => {
         it("should be able to search tracks", async () => {
             const { data } = await client
-                .query(searchTracksQuery, { input: { query: "WYBH save my life but...", limit: 1 } })
+                .query(searchTracksQuery, { query: "WYBH save my life but...", limit: 1 })
                 .toPromise();
 
             expect(data?.searchTracks).toEqual(
@@ -153,25 +145,19 @@ describe("Track (e2e)", () => {
         });
 
         it("should respect limit", async () => {
-            const result_1 = await client
-                .query(searchTracksQuery, { input: { query: "최엘비 독립음악", limit: 1 } })
-                .toPromise();
+            const result_1 = await client.query(searchTracksQuery, { query: "최엘비 독립음악", limit: 1 }).toPromise();
 
-            const result_5 = await client
-                .query(searchTracksQuery, { input: { query: "최엘비 독립음악", limit: 5 } })
-                .toPromise();
+            const result_5 = await client.query(searchTracksQuery, { query: "최엘비 독립음악", limit: 5 }).toPromise();
 
             expect(result_1.data?.searchTracks).toHaveLength(1);
             expect(result_5.data?.searchTracks).toHaveLength(5);
         });
 
         it("should respect locale", async () => {
-            const result_en = await client
-                .query(searchTracksQuery, { input: { query: "최엘비 독립음악", limit: 1 } })
-                .toPromise();
+            const result_en = await client.query(searchTracksQuery, { query: "최엘비 독립음악", limit: 1 }).toPromise();
 
             const result_ko = await client
-                .query(searchTracksQuery, { input: { query: "최엘비 독립음악", limit: 1, locale: "ko_KR" } })
+                .query(searchTracksQuery, { query: "최엘비 독립음악", limit: 1, locale: "ko_KR" })
                 .toPromise();
 
             expect(result_en.data?.searchTracks[0].title).toBe("Independent Music");

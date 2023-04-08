@@ -21,9 +21,7 @@ export class AlbumResolver {
     ) {}
 
     @Query(() => Album, { nullable: true })
-    public async album(
-        @Args("input", { type: () => GetItemInput }) { locale, id }: GetItemInput,
-    ): Promise<Nullable<Album>> {
+    public async album(@Args() { locale, id }: GetItemInput): Promise<Nullable<Album>> {
         return this.albumService.getItem(id, locale);
     }
 
@@ -36,14 +34,12 @@ export class AlbumResolver {
     }
 
     @Query(() => [Album], { nullable: "items" })
-    public async albums(
-        @Args("input", { type: () => GetItemsInput }) { locale, ids }: GetItemsInput,
-    ): Promise<Nullable<Album>[]> {
+    public async albums(@Args() { locale, ids }: GetItemsInput): Promise<Nullable<Album>[]> {
         return this.albumService.getItems(ids, locale);
     }
 
     @Query(() => [Album])
-    public async searchAlbums(@Args("input", { type: () => SearchInput }) input: SearchInput): Promise<Album[]> {
+    public async searchAlbums(@Args() input: SearchInput): Promise<Album[]> {
         return this.albumService.search(input);
     }
 }

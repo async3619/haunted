@@ -14,21 +14,17 @@ export class TrackResolver {
     public constructor(@Inject(TrackService) private readonly trackService: TrackService) {}
 
     @Query(() => Track, { nullable: true })
-    public async track(
-        @Args("input", { type: () => GetItemInput }) { locale, id }: GetItemInput,
-    ): Promise<Nullable<Track>> {
+    public async track(@Args() { locale, id }: GetItemInput): Promise<Nullable<Track>> {
         return this.trackService.getItem(id, locale);
     }
 
     @Query(() => [Track], { nullable: "items" })
-    public async tracks(
-        @Args("input", { type: () => GetItemsInput }) { locale, ids }: GetItemsInput,
-    ): Promise<Nullable<Track>[]> {
+    public async tracks(@Args() { locale, ids }: GetItemsInput): Promise<Nullable<Track>[]> {
         return this.trackService.getItems(ids, locale);
     }
 
     @Query(() => [Track])
-    public async searchTracks(@Args("input", { type: () => SearchInput }) input: SearchInput): Promise<Track[]> {
+    public async searchTracks(@Args() input: SearchInput): Promise<Track[]> {
         return this.trackService.search(input);
     }
 }

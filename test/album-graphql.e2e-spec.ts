@@ -12,9 +12,9 @@ import { GetItemsInput } from "@common/get-items-input.dto";
 import { GetItemInput } from "@common/get-item-input.dto";
 import { RootArtistAlbumsInput } from "@common/artist-albums-input.dto";
 
-const searchAlbumsQuery = gql<{ searchAlbums: PartialDeep<Album> }, { input: SearchInput }>`
-    query ($input: SearchInput!) {
-        searchAlbums(input: $input) {
+const searchAlbumsQuery = gql<{ searchAlbums: PartialDeep<Album> }, SearchInput>`
+    query ($query: String!, $limit: Int, $locale: String) {
+        searchAlbums(query: $query, limit: $limit, locale: $locale) {
             id
             title
             artists {
@@ -24,9 +24,9 @@ const searchAlbumsQuery = gql<{ searchAlbums: PartialDeep<Album> }, { input: Sea
         }
     }
 `;
-const albumsQuery = gql<{ albums: PartialDeep<Album>[] }, { input: GetItemsInput }>`
-    query ($input: GetItemsInput!) {
-        albums(input: $input) {
+const albumsQuery = gql<{ albums: PartialDeep<Album>[] }, GetItemsInput>`
+    query ($ids: [String!]!, $locale: String) {
+        albums(ids: $ids, locale: $locale) {
             id
             title
             artists {
@@ -36,9 +36,9 @@ const albumsQuery = gql<{ albums: PartialDeep<Album>[] }, { input: GetItemsInput
         }
     }
 `;
-const albumQuery = gql<{ album: PartialDeep<Album> }, { input: GetItemInput }>`
-    query ($input: GetItemInput!) {
-        album(input: $input) {
+const albumQuery = gql<{ album: PartialDeep<Album> }, GetItemInput>`
+    query ($id: String!, $locale: String) {
+        album(id: $id, locale: $locale) {
             id
             title
             artists {
@@ -83,9 +83,7 @@ describe("Album (e2e)", () => {
 
     describe("album (GraphQL)", () => {
         it("should be able to get album", async () => {
-            const { data } = await client
-                .query(albumQuery, { input: { id: "spotify::5DxGRsBdRlbyWoEWvrYQ5P" } })
-                .toPromise();
+            const { data } = await client.query(albumQuery, { id: "spotify::5DxGRsBdRlbyWoEWvrYQ5P" }).toPromise();
 
             expectContainPartially(data?.album, {
                 id: "spotify::5DxGRsBdRlbyWoEWvrYQ5P",
@@ -94,18 +92,16 @@ describe("Album (e2e)", () => {
         });
 
         it("should be able to return null if album is not found", async () => {
-            const { data } = await client.query(albumQuery, { input: { id: "spotify::test" } }).toPromise();
+            const { data } = await client.query(albumQuery, { id: "spotify::test" }).toPromise();
 
             expect(data?.album).toBeNull();
         });
 
         it("should respect locale", async () => {
-            const { data: en } = await client
-                .query(albumQuery, { input: { id: "spotify::5KyAvL3uY3CsyNXPjKmDyU" } })
-                .toPromise();
+            const { data: en } = await client.query(albumQuery, { id: "spotify::5KyAvL3uY3CsyNXPjKmDyU" }).toPromise();
 
             const { data: ko } = await client
-                .query(albumQuery, { input: { id: "spotify::5KyAvL3uY3CsyNXPjKmDyU", locale: "ko_KR" } })
+                .query(albumQuery, { id: "spotify::5KyAvL3uY3CsyNXPjKmDyU", locale: "ko_KR" })
                 .toPromise();
 
             expect(en?.album.title).toBe("Independent Music");
@@ -159,9 +155,7 @@ describe("Album (e2e)", () => {
 
     describe("albums (GraphQL)", () => {
         it("should be able to get albums", async () => {
-            const { data } = await client
-                .query(albumsQuery, { input: { ids: ["spotify::5DxGRsBdRlbyWoEWvrYQ5P"] } })
-                .toPromise();
+            const { data } = await client.query(albumsQuery, { ids: ["spotify::5DxGRsBdRlbyWoEWvrYQ5P"] }).toPromise();
 
             expectContainPartiallyInArray(data?.albums, {
                 id: "spotify::5DxGRsBdRlbyWoEWvrYQ5P",
@@ -170,18 +164,18 @@ describe("Album (e2e)", () => {
         });
 
         it("should be able to return null if album is not found", async () => {
-            const { data } = await client.query(albumsQuery, { input: { ids: ["spotify::test"] } }).toPromise();
+            const { data } = await client.query(albumsQuery, { ids: ["spotify::test"] }).toPromise();
 
             expect(data?.albums).toEqual([null]);
         });
 
         it("should respect locale", async () => {
             const { data: en } = await client
-                .query(albumsQuery, { input: { ids: ["spotify::5KyAvL3uY3CsyNXPjKmDyU"] } })
+                .query(albumsQuery, { ids: ["spotify::5KyAvL3uY3CsyNXPjKmDyU"] })
                 .toPromise();
 
             const { data: ko } = await client
-                .query(albumsQuery, { input: { ids: ["spotify::5KyAvL3uY3CsyNXPjKmDyU"], locale: "ko_KR" } })
+                .query(albumsQuery, { ids: ["spotify::5KyAvL3uY3CsyNXPjKmDyU"], locale: "ko_KR" })
                 .toPromise();
 
             expect(en?.albums[0].title).toBe("Independent Music");
@@ -191,9 +185,7 @@ describe("Album (e2e)", () => {
 
     describe("searchAlbums (GraphQL)", () => {
         it("should be able to search albums", async () => {
-            const { data } = await client
-                .query(searchAlbumsQuery, { input: { query: "독립음악", limit: 1 } })
-                .toPromise();
+            const { data } = await client.query(searchAlbumsQuery, { query: "독립음악", limit: 1 }).toPromise();
 
             expect(data?.searchAlbums).toEqual(
                 expect.arrayContaining([
@@ -210,25 +202,19 @@ describe("Album (e2e)", () => {
         });
 
         it("should respect limit", async () => {
-            const result_1 = await client
-                .query(searchAlbumsQuery, { input: { query: "독립음악", limit: 1 } })
-                .toPromise();
+            const result_1 = await client.query(searchAlbumsQuery, { query: "독립음악", limit: 1 }).toPromise();
 
-            const result_5 = await client
-                .query(searchAlbumsQuery, { input: { query: "독립음악", limit: 5 } })
-                .toPromise();
+            const result_5 = await client.query(searchAlbumsQuery, { query: "독립음악", limit: 5 }).toPromise();
 
             expect(result_1.data?.searchAlbums).toHaveLength(1);
             expect(result_5.data?.searchAlbums).toHaveLength(5);
         });
 
         it("should respect locale", async () => {
-            const result_en = await client
-                .query(searchAlbumsQuery, { input: { query: "독립음악", limit: 1 } })
-                .toPromise();
+            const result_en = await client.query(searchAlbumsQuery, { query: "독립음악", limit: 1 }).toPromise();
 
             const result_ko = await client
-                .query(searchAlbumsQuery, { input: { query: "독립음악", limit: 1, locale: "ko_KR" } })
+                .query(searchAlbumsQuery, { query: "독립음악", limit: 1, locale: "ko_KR" })
                 .toPromise();
 
             expect(result_en.data?.searchAlbums[0].title).toBe("Independent Music");

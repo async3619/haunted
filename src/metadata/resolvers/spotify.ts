@@ -3,12 +3,15 @@ import SpotifyWebApi from "spotify-web-api-node";
 
 import BaseResolver from "@metadata/resolvers/base";
 
-import { isRawAlbum } from "@common/album.dto";
+import { isRawAlbum, RawAlbum } from "@common/album.dto";
 import { RawArtistAlbums } from "@common/artist-albums.dto";
 import { SearchInput } from "@common/search-input.dto";
 
 import { JsonResponse, Request } from "@utils/request";
 import { Nullable } from "@utils/types";
+import dayjs from "dayjs";
+import { RawTrack } from "@common/track.dto";
+import { RawArtist } from "@common/artist.dto";
 
 export interface SpotifyResolverOptions {
     clientId: string;
@@ -192,7 +195,7 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
         return body.artists.items.map(this.composeArtist);
     }
 
-    private composeTrack(track: SpotifyApi.TrackObjectFull) {
+    private composeTrack(track: SpotifyApi.TrackObjectFull): RawTrack {
         return {
             id: track.id,
             title: track.name,
@@ -221,11 +224,17 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
             })),
         };
     }
-    private composeAlbum(album: SpotifyApi.AlbumObjectFull) {
+    private composeAlbum(album: SpotifyApi.AlbumObjectFull): RawAlbum {
+        const releaseDate = dayjs(album.release_date, "YYYY-MM-DD");
         return {
             id: album.id,
             title: album.name,
-            releaseDate: album.release_date,
+            releaseDate: {
+                year: releaseDate.year(),
+                month: releaseDate.month() + 1,
+                day: releaseDate.date(),
+                timestamp: releaseDate.unix(),
+            },
             trackCount: album.total_tracks,
             artists: album.artists.map(artist => ({
                 id: artist.id,
@@ -250,7 +259,7 @@ export class SpotifyResolver extends BaseResolver<"Spotify", SpotifyResolverOpti
             })),
         };
     }
-    private composeArtist(artist: SpotifyApi.ArtistObjectFull) {
+    private composeArtist(artist: SpotifyApi.ArtistObjectFull): RawArtist {
         return {
             id: artist.id,
             name: artist.name,

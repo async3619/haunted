@@ -5,8 +5,10 @@ import { Field, Int, ObjectType } from "@nestjs/graphql";
 import { MediaItem, RootMediaItem } from "@common/media-item.dto";
 import { PartialArtist } from "@common/artist.dto";
 import { Image } from "@common/image.dto";
+import { ReleaseDate } from "@common/release-date.dto";
 
 import { ToRawType } from "@common/types";
+import { Nullable } from "@utils/types";
 
 @ObjectType()
 export class AlbumTrack extends MediaItem {
@@ -37,8 +39,8 @@ export class Album extends RootMediaItem {
     @Field(() => [PartialArtist])
     public artists!: PartialArtist[];
 
-    @Field(() => String)
-    public releaseDate!: string;
+    @Field(() => ReleaseDate, { nullable: true })
+    public releaseDate!: Nullable<ReleaseDate>;
 
     @Field(() => Int)
     public trackCount!: number;

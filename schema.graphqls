@@ -42,6 +42,13 @@ type Track {
   album: TrackAlbum!
 }
 
+type ReleaseDate {
+  year: Int!
+  month: Int
+  day: Int
+  timestamp: Int!
+}
+
 type AlbumTrack {
   id: String!
   title: String!
@@ -57,7 +64,7 @@ type Album {
   serviceName: String!
   title: String!
   artists: [PartialArtist!]!
-  releaseDate: String!
+  releaseDate: ReleaseDate
   trackCount: Int!
   albumArts: [Image!]!
   tracks: [AlbumTrack!]!
